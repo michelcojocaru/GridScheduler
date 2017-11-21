@@ -12,7 +12,7 @@ import distributed.systems.gridscheduler.model.Job;
  *
  * The Simulation class is an example of a grid computation scenario. Every 100 milliseconds 
  * a new job is added to first cluster. As this cluster is swarmed with jobs, it offloads
- * some of them to the grid scheduler, wich in turn passes them to the other clusters.
+ * some of them to the grid scheduler, which in turn passes them to the other clusters.
  * 
  * @author Niels Brouwers, Boaz Pat-El
  */

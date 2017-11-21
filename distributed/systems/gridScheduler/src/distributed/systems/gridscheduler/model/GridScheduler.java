@@ -113,11 +113,11 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin)
 			resourceManagerLoad.put(controlMessage.getUrl(), Integer.MAX_VALUE);
 		
-		// resource manager wants to offload a job to us 
+		// resource manager wants to offload a job to us		WHAT THE FUCK ?
 		if (controlMessage.getType() == ControlMessageType.AddJob)
 			jobQueue.add(controlMessage.getJob());
 			
-		// resource manager wants to offload a job to us 
+		// resource manager wants to offload a job to us 		WHAT THE FUCK ?
 		if (controlMessage.getType() == ControlMessageType.ReplyLoad)
 			resourceManagerLoad.put(controlMessage.getUrl(),controlMessage.getLoad());
 			

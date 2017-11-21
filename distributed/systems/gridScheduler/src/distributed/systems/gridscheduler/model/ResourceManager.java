@@ -43,7 +43,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * <DT><B>Preconditions:</B>
 	 * <DD>the parameter <CODE>cluster</CODE> cannot be null
 	 * </DL>
-	 * @param cluster the cluster to wich this resource manager belongs.
+	 * @param cluster the cluster to which this resource manager belongs.
 	 */
 	public ResourceManager(Cluster cluster)	{
 		// preconditions
