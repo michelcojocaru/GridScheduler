@@ -11,6 +11,7 @@ import java.util.ArrayList;
  *
  */
 public class Node {
+
 	private NodeStatus status;
 	private Job runningJob = null;
 	private long startTime;

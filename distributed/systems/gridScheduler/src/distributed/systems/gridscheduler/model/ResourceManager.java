@@ -1,10 +1,12 @@
 package distributed.systems.gridscheduler.model;
 
+import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import distributed.systems.core.IMessageReceivedHandler;
 import distributed.systems.core.Message;
+import distributed.systems.core.Socket;
 import distributed.systems.core.SynchronizedSocket;
 import distributed.systems.example.LocalSocket;
 
@@ -25,11 +27,12 @@ import distributed.systems.example.LocalSocket;
  *
  */
 public class ResourceManager implements INodeEventHandler, IMessageReceivedHandler {
+
 	private Cluster cluster;
 	private Queue<Job> jobQueue;
-	private String socketURL;
+	private String name;
 	private int jobQueueSize;
-	public static final int MAX_QUEUE_SIZE = 32; 
+	public static final int MAX_QUEUE_SIZE = 32;
 
 	// Scheduler url
 	private String gridSchedulerURL = null;
@@ -45,14 +48,14 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * </DL>
 	 * @param cluster the cluster to which this resource manager belongs.
 	 */
-	public ResourceManager(Cluster cluster)	{
+	public ResourceManager(Cluster cluster) throws IOException {
 		// preconditions
 		assert(cluster != null);
 
 		this.jobQueue = new ConcurrentLinkedQueue<Job>();
 
 		this.cluster = cluster;
-		this.socketURL = cluster.getName();
+		this.name = cluster.getName();
 
 		// Number of jobs in the queue must be larger than the number of nodes, because
 		// jobs are kept in queue until finished. The queue is a bit larger than the 
@@ -62,11 +65,11 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		LocalSocket lSocket = new LocalSocket();
 		socket = new SynchronizedSocket(lSocket);
-		socket.register(socketURL);
+		socket.register(name);
 
 		socket.addMessageReceivedHandler(this);
 	}
-
+	//TODO implement logger
 	/**
 	 * Add a job to the resource manager. If there is a free node in the cluster the job will be
 	 * scheduled onto that Node immediately. If all nodes are busy the job will be put into a local
@@ -88,8 +91,13 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		if (jobQueue.size() >= jobQueueSize) {
 
 			ControlMessage controlMessage = new ControlMessage(ControlMessageType.AddJob);
+			//include the sender url into the message
+			controlMessage.setSource(cluster.getName());
+			controlMessage.setDestination(gridSchedulerURL);
+			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
 			socket.sendMessage(controlMessage, "localsocket://" + gridSchedulerURL);
+
 
 			// otherwise store it in the local queue
 		} else {
@@ -111,6 +119,21 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// no waiting jobs found, return null
 		return null;
+	}
+
+	/**
+	 * Counts to find a waiting job in the jobqueue.
+	 * @return
+	 */
+	public int getWaitingJobsCount() {
+		int count = 0;
+		// find a waiting job
+		for (Job job : jobQueue)
+			if (job.getStatus() == JobStatus.Waiting)
+				count++;
+
+		// no waiting jobs found, return null
+		return count;
 	}
 
 	/**
@@ -148,6 +171,18 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		return gridSchedulerURL;
 	}
 
+	public String getName(){
+		return name;
+	}
+
+	public void setName(String name){
+		this.name = name;
+	}
+
+	public Queue<Job> getJobQueue(){
+		return this.jobQueue;
+	}
+
 	/**
 	 * Connect to a grid scheduler
 	 * <p>
@@ -162,10 +197,14 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		this.gridSchedulerURL = gridSchedulerURL;
 
 		ControlMessage message = new ControlMessage(ControlMessageType.ResourceManagerJoin);
-		message.setUrl(socketURL);
+		//message.setUrl(socketURL);
+		message.setSource(cluster.getName());
+		message.setDestination(gridSchedulerURL);	//redundant I know...
+
 		socket.sendMessage(message, "localsocket://" + gridSchedulerURL);
 
 	}
+
 
 	/**
 	 * Message received handler
@@ -188,15 +227,22 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			scheduleJobs();
 		}
 
-		// resource manager wants to offload a job to us 
+		// Grid scheduler asks for the load of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestLoad)
 		{
+			System.out.println("[Resource Manager] RM: " + this.cluster.getName() + " received a request load from GS: " + controlMessage.getSource());
+
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyLoad);
-			replyMessage.setUrl(cluster.getName());
-			replyMessage.setLoad(jobQueue.size());
-			socket.sendMessage(replyMessage, "localsocket://" + controlMessage.getUrl());				
+
+			replyMessage.setSource(cluster.getName());
+			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
+			replyMessage.setLoad(jobQueue.size()); //cluster.countFreeNodes())
+
+			socket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
+
 		}
 
 	}
+
 
 }

@@ -23,6 +23,28 @@ public class ControlMessage extends Message {
 	private Job job;
 	private int load;
 
+	//any message should have the source and the destination included into the payload
+	private String source;
+	private String destination;
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getDestination() {
+		return destination;
+	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+
+
 	/**
 	 * Constructs a new ControlMessage object
 	 * @param type the type of control message

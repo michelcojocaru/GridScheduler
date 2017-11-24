@@ -22,11 +22,11 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 	// job queue
 	private ConcurrentLinkedQueue<Job> jobQueue;
 	
-	// local url
-	private final String url;
+	// local address
+	private final String address;
 
 	// communications socket
-	private Socket socket;
+	private SynchronizedSocket socket;
 	
 	// a hashmap linking each resource manager to an estimated load
 	private ConcurrentHashMap<String, Integer> resourceManagerLoad;
@@ -39,31 +39,31 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 	private boolean running;
 	
 	/**
-	 * Constructs a new GridScheduler object at a given url.
+	 * Constructs a new GridScheduler object at a given address.
 	 * <p>
 	 * <DL>
 	 * <DT><B>Preconditions:</B>
-	 * <DD>parameter <CODE>url</CODE> cannot be null
+	 * <DD>parameter <CODE>address</CODE> cannot be null
 	 * </DL>
-	 * @param url the gridscheduler's url to register at
+	 * @param address the gridscheduler's address to register at
 	 */
-	public GridScheduler(String url) {
+	public GridScheduler(String address) {
 		// preconditions
-		assert(url != null) : "parameter 'url' cannot be null";
+		assert(address != null) : "parameter 'address' cannot be null";
 		
 		// init members
-		this.url = url;
+		this.address = address;
 		this.resourceManagerLoad = new ConcurrentHashMap<String, Integer>();
 		this.jobQueue = new ConcurrentLinkedQueue<Job>();
-		
+
 		// create a messaging socket
 		LocalSocket lSocket = new LocalSocket();
 		socket = new SynchronizedSocket(lSocket);
 		socket.addMessageReceivedHandler(this);
-		
+
 		// register the socket under the name of the gridscheduler.
 		// In this way, messages can be sent between components by name.
-		socket.register(url);
+		socket.register(address);
 
 		// start the polling thread
 		running = true;
@@ -76,8 +76,8 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 	 * It is passed to the constructor and cannot be changed afterwards.
 	 * @return the name of the gridscheduler
 	 */
-	public String getUrl() {
-		return url;
+	public String getAddress() {
+		return address;
 	}
 
 	/**
@@ -104,27 +104,33 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 		// preconditions
 		assert(message instanceof ControlMessage) : "parameter 'message' should be of type ControlMessage";
 		assert(message != null) : "parameter 'message' cannot be null";
-		
-		ControlMessage controlMessage = (ControlMessage)message;
+
+		ControlMessage controlMessage = (ControlMessage) message;
 		
 		// resource manager wants to join this grid scheduler 
 		// when a new RM is added, its load is set to Integer.MAX_VALUE to make sure
 		// no jobs are scheduled to it until we know the actual load
-		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin)
-			resourceManagerLoad.put(controlMessage.getUrl(), Integer.MAX_VALUE);
-		
+		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin) {
+			resourceManagerLoad.put(controlMessage.getSource(), Integer.MAX_VALUE);
+		}
 		// resource manager wants to offload a job to us		WHAT THE FUCK ?
-		if (controlMessage.getType() == ControlMessageType.AddJob)
+		if (controlMessage.getType() == ControlMessageType.AddJob) {
+			System.out.println("[GridScheduler] " + this.getAddress() + " received a job from RM: " + controlMessage.getSource());
 			jobQueue.add(controlMessage.getJob());
+		}
 			
-		// resource manager wants to offload a job to us 		WHAT THE FUCK ?
-		if (controlMessage.getType() == ControlMessageType.ReplyLoad)
-			resourceManagerLoad.put(controlMessage.getUrl(),controlMessage.getLoad());
+		// resource manager wants to offload a job to us 		WHAT THE FUCK ? It means to get the load from the rm
+		if (controlMessage.getType() == ControlMessageType.ReplyLoad) {
+			int load = controlMessage.getLoad();
+			String address = controlMessage.getSource();
+			System.out.println("[GridScheduler] GS: " + this.getAddress() + " received the load of: " + load + " from RM: " + address);
+			resourceManagerLoad.put(address, load);
+		}
 			
 		
 	}
 
-	// finds the least loaded resource manager and returns its url
+	// finds the least loaded resource manager and returns its address
 	private String getLeastLoadedRM() {
 		String ret = null; 
 		int minLoad = Integer.MAX_VALUE;
@@ -149,23 +155,32 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 	public void run() {
 		while (running) {
 			// send a message to each resource manager, requesting its load
-			for (String rmUrl : resourceManagerLoad.keySet())
+			for (String rmAdress : resourceManagerLoad.keySet())
 			{
 				ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestLoad);
-				cMessage.setUrl(this.getUrl());
-				socket.sendMessage(cMessage, "localsocket://" + rmUrl);
+
+				cMessage.setUrl(this.getAddress());
+				cMessage.setSource(this.getAddress());
+				cMessage.setDestination(rmAdress);
+
+				socket.sendMessage(cMessage, "localsocket://" + rmAdress);
 			}
-			
+			//TODO cere loadul tuturor rm urilor
+
 			// schedule waiting messages to the different clusters
 			for (Job job : jobQueue)
 			{
 				String leastLoadedRM =  getLeastLoadedRM();
 				
-				if (leastLoadedRM!=null) {
+				if (leastLoadedRM != null) {
 				
 					ControlMessage cMessage = new ControlMessage(ControlMessageType.AddJob);
 					cMessage.setJob(job);
+					cMessage.setSource(this.getAddress());
+					cMessage.setDestination(leastLoadedRM);
+
 					socket.sendMessage(cMessage, "localsocket://" + leastLoadedRM);
+					System.out.println("Grid scheduler sends job to RM: " + leastLoadedRM);
 					
 					jobQueue.remove(job);
 					
@@ -176,7 +191,7 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 				}
 				
 			}
-			
+
 			// sleep
 			try
 			{

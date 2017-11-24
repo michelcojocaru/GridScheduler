@@ -4,10 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.List;
+import java.util.Queue;
 
-import distributed.systems.gridscheduler.model.Cluster;
-import distributed.systems.gridscheduler.model.Node;
-import distributed.systems.gridscheduler.model.NodeStatus;
+import distributed.systems.gridscheduler.model.*;
+
+import static distributed.systems.gridscheduler.model.ResourceManager.MAX_QUEUE_SIZE;
 
 /**
  * 
@@ -29,6 +30,7 @@ public class ClusterStatusPanel extends StatusPanel {
 	final static Color idleColor = Color.white;
 	final static Color busyColor = Color.blue;
 	final static Color downColor = Color.red;
+	final static Color scheduledColor = Color.orange;
 	
 	/**
 	 * Generated serialversionUID
@@ -38,7 +40,8 @@ public class ClusterStatusPanel extends StatusPanel {
 	private Cluster cluster;
 
 	private int colWidth;
-	
+	private int rightAlligned;
+
 	public ClusterStatusPanel(Cluster cluster) {
 		this.cluster = cluster;
     	
@@ -46,8 +49,8 @@ public class ClusterStatusPanel extends StatusPanel {
 		colWidth = panelWidth / 2;
 		int nodeBoxSize = nodeSize + padding;
 		double nodeLines = (nodeBoxSize * cluster.getNodeCount()) / (double)(panelWidth - padding);
-		int height = statusTextHeight + padding * 2 + 
-			((int)Math.ceil(nodeLines)) * nodeBoxSize;
+		int height = statusTextHeight + padding * 2 +
+			3 * ((int)Math.ceil(nodeLines)) * nodeBoxSize;
 		
 		//setSize(new Dimension(panelWidth, height));
 		setPreferredSize(new Dimension(panelWidth, height));
@@ -66,6 +69,7 @@ public class ClusterStatusPanel extends StatusPanel {
 	    
 	    // calculate load and availability
 	    List <Node> nodes = cluster.getNodes();
+	    Queue<Job> jobQueue = cluster.getResourceManager().getJobQueue();
 	    
 	    int nrBusyNodes = 0;
 	    int nrDownNodes = 0;
@@ -97,7 +101,7 @@ public class ClusterStatusPanel extends StatusPanel {
 	    g.drawString("" + availability + "%", x + colWidth, y);
 	    y += fontHeight;
 	    
-	    x = padding;
+	    rightAlligned = x = padding;
 	    y = statusTextHeight + padding;
 
 	    g.setColor(Color.gray);
@@ -123,6 +127,28 @@ public class ClusterStatusPanel extends StatusPanel {
 	    	}
 	    	
 	    }
+
+	    x = rightAlligned;
+		y += 3 * padding;
+
+	    //TODO redo this in order for the jobQueue to be visible underneath the node list
+		for(int i = 0; i < MAX_QUEUE_SIZE; i++){
+			// determine color of the job box
+			g.setColor(idleColor);
+			if(i < cluster.getResourceManager().getWaitingJobsCount()/* jobQueue.size()  /* && jobQueue.peek().getStatus() == JobStatus.Waiting*/) {
+				g.setColor(scheduledColor);
+			}
+			g.fillRect(x, y, nodeSize/2, nodeSize);
+
+			g.setColor(Color.black);
+			g.drawRect(x, y, nodeSize/2, nodeSize);
+			x += nodeSize/2 + padding/2;
+
+			if (x + nodeSize/2 + padding/2 > getWidth()) {
+				x = rightAlligned;
+				y += nodeSize + padding;
+			}
+		}
 
     }	
 

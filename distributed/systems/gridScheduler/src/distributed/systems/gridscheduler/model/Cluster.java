@@ -1,5 +1,6 @@
 package distributed.systems.gridscheduler.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +33,14 @@ public class Cluster implements Runnable {
 	 * <DD>parameter <CODE>gridSchedulerURL</CODE> cannot be null<br>
 	 * <DD>parameter <CODE>nrNodes</code> must be greater than 0
 	 * </DL>
-	 * @param name the name of this cluster
 	 * @param nrNodes the number of nodes in this cluster
+	 * @param name the name of this cluster
+	 * @param gridSchedulerURL
 	 */
-	public Cluster(String name, String gridSchedulerURL, int nodeCount) {
+	public Cluster(String name, GridScheduler gridScheduler, int nodeCount) throws IOException {
 		// Preconditions
 		assert(name != null) : "parameter 'name' cannot be null";
-		assert(gridSchedulerURL != null) : "parameter 'gridSchedulerURL' cannot be null";
+		assert(gridScheduler != null) : "parameter 'gridSchedulerURL' cannot be null";
 		assert(nodeCount > 0) : "parameter 'nodeCount' cannot be smaller or equal to zero";
 		
 		// Initialize members
@@ -48,7 +50,7 @@ public class Cluster implements Runnable {
 		
 		// Initialize the resource manager for this cluster
 		resourceManager = new ResourceManager(this);
-		resourceManager.connectToGridScheduler(gridSchedulerURL);
+		resourceManager.connectToGridScheduler(gridScheduler.getAddress());
 
 		// Initialize the nodes 
 		for (int i = 0; i < nodeCount; i++) {
@@ -65,6 +67,8 @@ public class Cluster implements Runnable {
 		pollingThread.start();
 		
 	}
+
+
 
 	/**
 	 * Returns the number of nodes in this cluster. 
@@ -110,6 +114,16 @@ public class Cluster implements Runnable {
 		// if we haven't returned from the function here, we haven't found a suitable node
 		// so we just return null
 		return null;
+	}
+
+	public int countFreeNodes(){
+		int nrNodes = this.getNodes().size();
+		int count = 0;
+		for (Node node : nodes)
+			if (node.getStatus() == NodeStatus.Idle){
+				count++;
+			}
+		return nrNodes - count;
 	}
 
 	/**
