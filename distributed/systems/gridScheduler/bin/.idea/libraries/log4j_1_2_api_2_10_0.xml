@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="log4j-1.2-api-2.10.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/systems/gridScheduler/lib/apache-log4j-2.10.0-bin/log4j-1.2-api-2.10.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

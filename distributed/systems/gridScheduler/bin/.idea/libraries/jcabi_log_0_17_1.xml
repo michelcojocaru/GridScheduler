@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jcabi-log-0.17.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/systems/gridScheduler/lib/jcabi-log-0.17.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
