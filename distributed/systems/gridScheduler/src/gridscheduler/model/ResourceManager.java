@@ -71,7 +71,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		socket.addMessageReceivedHandler(this);
 	}
-	//TODO implement logger
+
 	/**
 	 * Add a job to the resource manager. If there is a free node in the cluster the job will be
 	 * scheduled onto that Node immediately. If all nodes are busy the job will be put into a local
@@ -98,6 +98,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			controlMessage.setDestination(gridSchedulerURL);
 			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
+			job.addClusterToVisited(this.cluster.getName());
 			socket.sendMessage(controlMessage, "localsocket://" + gridSchedulerURL);
 
 
@@ -164,12 +165,23 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// job finished, remove it from our pool
 		jobQueue.remove(job);
+
+
+		//ask the GS to notify all the other RMs to remove the job from their queues (if present)
+		ControlMessage nMessage = new ControlMessage(ControlMessageType.NotifyJobCompletion);
+		nMessage.setSource(this.cluster.getName());
+		nMessage.setDestination(getGridSchedulerAddress());
+		nMessage.setJob(job);
+
+		logger.info("Job " + job.getId() + " done on " + this.cluster.getName());
+		socket.sendMessage(nMessage,"localsocket://" + getGridSchedulerAddress());
+
 	}
 
 	/**
 	 * @return the url of the grid scheduler this RM is connected to 
 	 */
-	public String getGridSchedulerURL() {
+	public String getGridSchedulerAddress() {
 		return gridSchedulerURL;
 	}
 
@@ -199,7 +211,6 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		this.gridSchedulerURL = gridSchedulerURL;
 
 		ControlMessage message = new ControlMessage(ControlMessageType.ResourceManagerJoin);
-		//message.setUrl(socketURL);
 		message.setSource(cluster.getName());
 		message.setDestination(gridSchedulerURL);	//redundant I know...
 
@@ -225,6 +236,9 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		// resource manager wants to offload a job to us 
 		if (controlMessage.getType() == ControlMessageType.AddJob)
 		{
+			//mark this cluster as visited
+			controlMessage.getJob().addClusterToVisited(this.cluster.getName());
+			//include this job in the waiting queue of this cluster
 			jobQueue.add(controlMessage.getJob());
 			scheduleJobs();
 		}
@@ -242,6 +256,17 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 			socket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 
+		}
+
+		// Grid Scheduler asks this RM to remove a pending job from its queue
+		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
+			for(Job job:jobQueue){
+				if(job.getId() == controlMessage.getJob().getId()){
+					jobQueue.remove(job);
+					logger.warn("RM: " + this.cluster.getName() + " removed job " + job.getId() + " from its queue.");
+					break;
+				}
+			}
 		}
 
 	}

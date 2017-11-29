@@ -19,7 +19,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  */
 public class GridScheduler implements IMessageReceivedHandler, Runnable {
-	
+
+
 	// job queue
 	private ConcurrentLinkedQueue<Job> jobQueue;
 	
@@ -32,12 +33,17 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 	// a hashmap linking each resource manager to an estimated load
 	private ConcurrentHashMap<String, Integer> resourceManagerLoad;
 
+	// a hashmap linking each grid scheduler to an estimated load
+	private ConcurrentHashMap<String, Integer> gridSchedulerLoad;
+
 	// polling frequency, 1hz
 	private long pollSleep = 1000;
 	
 	// polling thread
 	private Thread pollingThread;
 	private boolean running;
+
+
 
 	private final static Logger logger = Logger.getLogger(GridScheduler.class.getName());
 	
@@ -120,6 +126,7 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 		}
 		// resource manager wants to offload a job to us		WHAT THE FUCK ?
 		if (controlMessage.getType() == ControlMessageType.AddJob) {
+			//TODO log the GS also into the visited cluster
 			logger.info("GS: " + this.getAddress() + " received a job from RM: " + controlMessage.getSource());
 			jobQueue.add(controlMessage.getJob());
 		}
@@ -130,6 +137,13 @@ public class GridScheduler implements IMessageReceivedHandler, Runnable {
 			String address = controlMessage.getSource();
 			logger.info("GS: " + this.getAddress() + " received the load of: " + load + "% from RM: " + address);
 			resourceManagerLoad.put(address, load);
+		}
+
+		// one of the clusters notified the GS that it completed a job
+		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
+			socket.sendMessage(controlMessage,"localhost://placeholder"); //TODO get rid of the address field
+			jobQueue.remove(controlMessage.getJob());
+
 		}
 			
 		

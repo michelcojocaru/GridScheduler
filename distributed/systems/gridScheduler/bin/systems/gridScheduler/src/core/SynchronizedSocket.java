@@ -55,6 +55,16 @@ public class SynchronizedSocket extends Socket{
 		}
 	}
 
+	// broadcast the message to all RMs except the one that issued the request
+	private void broadcastToAllRMs(ControlMessage cMessage){
+		for (ResourceManager resourceManager : resourceManagers) {
+			if (!cMessage.getSource().equals(resourceManager.getName())) {
+				logger.info("GS: " + cMessage.getSource() + " is sending a job " + cMessage.getJob().getId() + " removal request to RM: " + resourceManager.getName());
+				resourceManager.onMessageReceived(cMessage);
+			}
+		}
+	}
+
 	//TODO check for defects
 	public void sendMessage(ControlMessage cMessage, String address){
 		// RM to GS / GS to RM
@@ -85,6 +95,10 @@ public class SynchronizedSocket extends Socket{
 
 			//System.out.println("RM connected to GS - ResourceManagerJoin");
 			send(cMessage,address);
+		}
+
+		if(cMessage.getType() == ControlMessageType.NotifyJobCompletion){
+			broadcastToAllRMs(cMessage);
 		}
 
 	}

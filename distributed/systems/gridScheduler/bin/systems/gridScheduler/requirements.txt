@@ -1,0 +1,51 @@
+
+
+
+
+
+
+
+
+
+
+
+THE GS NODE CAN ALSO request load from de RM
+
+each cluster
+
+1. fixed sized cluster | without fixed sized
+
+1. jobs running at nodes/ idle nodes / long ques rms/ short ques rms - balance
+- calculate utilization of each cluster which is defined by number of jobs running in the cluster/ size
+- each cluster has a utilization %
+- take average of %
+- try to migrate jobs so each cluster gets to that average
+- if all the nodes of all the clusters are running jobs =?>100% utilization => load job queues (ask each cluster how many jobs are pending)
+- take average of those jobs that are pending and try to migrate jobs so each clusters job que has the same amount of jobs
+
+When a job finishes and sends a kill signal and in the same time another instance of the job finishes and sends the same kill signal
+it is redundant because the job has already been killed. (later fix) (tradeoff performance between the comunication overhead and the
+performance)
+
+assumption - RM do not fail
+If we have time, study the scenario that it fails
+
+
+fault tolerance:
+Every single job that is dispatched to a GS node is replicated
+
+why do we use GS nodes?
+to even the load between the clusters
+
+Gs nodes have knowledge of the whole cluster. 
+
+Create 2 instances of the job and send the to at least two different cluster, only if the job came from the RM to the GS
+IT MAY BE SLOW, IT MAY CRASH - you send to many clusters and hope it will finish faster that if I send it only to one
+
+RM -> GS move
+Gs -> RM copy
+
+a moved job from the RM is going to go to which ever GS is available. It is also going to copy that job to the linked replica GS which is
+IDLE
+
+the linked replica is a deep copy because GS ques are no persistent

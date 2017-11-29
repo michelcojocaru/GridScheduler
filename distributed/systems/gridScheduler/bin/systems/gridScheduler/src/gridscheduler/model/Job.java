@@ -1,5 +1,11 @@
 package gridscheduler.model;
 
+import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+
+
+
 /**
  * This class represents a job that can be executed on a grid. 
  * 
@@ -10,6 +16,9 @@ public class Job {
 	private long duration;
 	private JobStatus status;
 	private long id;
+	private ArrayList<String> visitedClusters = null;
+
+	private final static Logger logger = Logger.getLogger(Job.class.getName());
 
 	/**
 	 * Constructs a new Job object with a certain duration and id. The id has to be unique
@@ -28,7 +37,20 @@ public class Job {
 
 		this.duration = duration;
 		this.status = JobStatus.Waiting;
-		this.id = id; 
+		this.id = id;
+		this.visitedClusters = new ArrayList<>();
+	}
+
+	public void addClusterToVisited(String cluster){
+		visitedClusters.add(cluster);
+		logger.info("Cluster: " + cluster + " was added to Jobs " + this.getId() + " visited queue.");
+	}
+
+	public void removeClusterFromVisited(String cluster){
+		if(visitedClusters.contains(cluster)){
+			visitedClusters.remove(cluster);
+			logger.info("Cluster: " + cluster + " was removed from Jobs " + this.getId() + " visited queue.");
+		}
 	}
 
 	/**

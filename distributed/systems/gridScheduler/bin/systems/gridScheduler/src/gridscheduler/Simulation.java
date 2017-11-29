@@ -43,11 +43,6 @@ public class Simulation implements Runnable,KeyListener {
 	private final static Logger logger = Logger.getLogger(Simulation.class.getName());
 	private static DecimalFormat df2 = new DecimalFormat(".##");
 
-
-
-
-
-
 	/**
 	 * Constructs a new simulation object. Study this code to see how to set up your own
 	 * simulation.
@@ -104,11 +99,13 @@ public class Simulation implements Runnable,KeyListener {
 		gridSchedulerPanel.addKeyListener(this);
 		// Do not stop the simulation as long as the gridscheduler panel remains open
 		while (gridSchedulerPanel.isVisible()) {
-			// Add a new job to the system that take up random time
-			Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
 
-			clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
 
+			// Uncomment one at a time in order to simulate different behaviours
+
+			//evenLoad(jobId); // randomly distributes jobs to cluster (nearly uniform distribution)
+			unEvenLoad(jobId,5); //TODO make the ratio parameterized (extreme high load)
+			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
 				// Sleep a while before creating a new job
@@ -119,6 +116,32 @@ public class Simulation implements Runnable,KeyListener {
 
 		}
 
+	}
+
+	public void evenLoad(long jobId){
+		// Add a new job to the system that take up random time
+		Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
+		clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
+	}
+
+	public void unEvenLoad(long jobId, int ratio){
+		int highLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
+		int lowLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
+		for (int i = 0; i < ratio; i++) {
+			// Add a new job to the system that take up random time
+			Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
+			clusters[highLoadTargetCluster].getResourceManager().addJob(job);
+		}
+		Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
+		clusters[lowLoadTargetCluster].getResourceManager().addJob(job);
+	}
+
+	public void loadSameJobOnMultipleClusters(long jobId, int noClusters){
+		// Add a new job to the system that take up random time
+		Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
+		for(int i = 0; i < noClusters; i++) {
+			clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
+		}
 	}
 
 	@Override
