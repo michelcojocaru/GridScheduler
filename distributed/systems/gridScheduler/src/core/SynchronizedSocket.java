@@ -1,10 +1,7 @@
 package core;
 
 import example.LocalSocket;
-import gridscheduler.model.ControlMessage;
-import gridscheduler.model.ControlMessageType;
-import gridscheduler.model.GridScheduler;
-import gridscheduler.model.ResourceManager;
+import gridscheduler.model.*;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -12,8 +9,9 @@ import java.util.ArrayList;
 public class SynchronizedSocket extends Socket{
 
 	private LocalSocket localSocket = null;
-	private static ArrayList<ResourceManager> resourceManagers = new ArrayList<ResourceManager>(); //good
-	private static GridScheduler gridScheduler = null;
+	private static ArrayList<ResourceManager> resourceManagers = null; //good
+	private static GridSchedulerNode gridSchedulerNode = null;
+
 	//TODO find a use for this name
 	private String socketName = null;
 
@@ -21,17 +19,19 @@ public class SynchronizedSocket extends Socket{
 
 	public SynchronizedSocket(LocalSocket lSocket){
 		this.localSocket = lSocket;
+
+
 	}
 
 	public void addMessageReceivedHandler(ResourceManager resourceManager) {
 		resourceManagers.add(resourceManager);
-		logger.info("RM: " + resourceManager.getName() + " registered to " + gridScheduler.getAddress());
+		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchedulerNode.getAddress());
 
 	}
 
-	public void addMessageReceivedHandler(GridScheduler gs) {
-		gridScheduler = gs;
-		logger.info("GS: " + gridScheduler.getAddress() + " registered to " + socketName);
+	public void addMessageReceivedHandler(GridSchedulerNode gs) {
+		gridSchedulerNode = gs;
+		logger.info("GS: " + gridSchedulerNode.getAddress() + " registered to " + socketName);
 
 	}
 
@@ -41,8 +41,8 @@ public class SynchronizedSocket extends Socket{
 
 	private void send(ControlMessage cMessage,String address) {
 
-		if (cMessage.getDestination().equals(gridScheduler.getAddress())) {
-			gridScheduler.onMessageReceived(cMessage);
+		if (cMessage.getDestination().equals(gridSchedulerNode.getAddress())) {
+			gridSchedulerNode.onMessageReceived(cMessage);
 		}else {
 
 			for (ResourceManager resourceManager : resourceManagers) {
@@ -70,7 +70,7 @@ public class SynchronizedSocket extends Socket{
 		// RM to GS / GS to RM
 		if(cMessage.getType() == ControlMessageType.AddJob){
 
-			if(gridScheduler != null || !resourceManagers.isEmpty()){
+			if(gridSchedulerNode != null || !resourceManagers.isEmpty()){
 				send(cMessage,address);
 			}
 		}
@@ -86,8 +86,8 @@ public class SynchronizedSocket extends Socket{
 		if(cMessage.getType() == ControlMessageType.ReplyLoad){
 
 			//System.out.println("RM to GS - ReplyLoad");
-			if(gridScheduler != null){
-				gridScheduler.onMessageReceived(cMessage);
+			if(gridSchedulerNode != null){
+				gridSchedulerNode.onMessageReceived(cMessage);
 			}
 		}
 

@@ -3,7 +3,7 @@ package gridscheduler;
 import gridscheduler.gui.ClusterStatusPanel;
 import gridscheduler.gui.GridSchedulerPanel;
 import gridscheduler.model.Cluster;
-import gridscheduler.model.GridScheduler;
+import gridscheduler.model.Supervisor;
 import gridscheduler.model.Job;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * The Simulation class is an example of a grid computation scenario. Every 100 milliseconds 
  * a new job is added to first cluster. As this cluster is swarmed with jobs, it offloads
- * some of them to the grid scheduler, which in turn passes them to the other clusters.
+ * some of them to the grid supervisor, which in turn passes them to the other clusters.
  * 
  * @author Niels Brouwers, Boaz Pat-El
  */
@@ -51,13 +51,13 @@ public class Simulation implements Runnable,KeyListener {
 
 		BasicConfigurator.configure();
 
-		GridScheduler scheduler;
+		Supervisor supervisor;
 
-		// Setup the model. Create a grid scheduler and a set of clusters.
-		scheduler = new GridScheduler("scheduler1");
+		// Setup the model. Create a grid supervisor and a set of clusters.
+		supervisor = new Supervisor("supervisor",6);
 
 		// Create a new gridscheduler panel so we can monitor our components
-		gridSchedulerPanel = new GridSchedulerPanel(scheduler);
+		gridSchedulerPanel = new GridSchedulerPanel(supervisor);
 		gridSchedulerPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		logger.info("Simulation started.");
@@ -65,7 +65,7 @@ public class Simulation implements Runnable,KeyListener {
 		// Create the clusters and nods
 		clusters = new Cluster[nrClusters];
 		for (int i = 0; i < nrClusters; i++) {
-			clusters[i] = new Cluster("cluster" + i, scheduler, nrNodes);
+			clusters[i] = new Cluster("cluster" + i, supervisor, nrNodes);
 
 			// Now create a cluster status panel for each cluster inside this gridscheduler
 			ClusterStatusPanel clusterReporter = new ClusterStatusPanel(clusters[i]);
@@ -85,8 +85,8 @@ public class Simulation implements Runnable,KeyListener {
 		for (Cluster cluster : clusters)
 			cluster.stopPollThread();
 
-		// Stop grid scheduler
-		scheduler.stopPollThread();
+		// Stop grid supervisor
+		supervisor.stopPollThread();
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package gridscheduler.gui;
 
-import gridscheduler.model.GridScheduler;
+import gridscheduler.model.Supervisor;
 
 import java.awt.*;
 
@@ -23,9 +23,9 @@ public class GridSchedulerStatusPanel extends StatusPanel {
 	private final static int panelWidth = 300;
 	private int colWidth = panelWidth / 2;
 
-	private GridScheduler scheduler;
+	private Supervisor scheduler;
 	
-	public GridSchedulerStatusPanel(GridScheduler scheduler) {
+	public GridSchedulerStatusPanel(Supervisor scheduler) {
 		this.scheduler = scheduler;
 		setPreferredSize(new Dimension(panelWidth,50));
 	}

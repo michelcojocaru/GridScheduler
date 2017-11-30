@@ -11,9 +11,11 @@ public enum ControlMessageType {
 
 	// from RM to GS
 	ResourceManagerJoin,
+
+	// from RM to GS node
 	ReplyLoad,
 
-	// from GS to RM
+	// from GS node to RM
 	RequestLoad,
 
 	// both ways

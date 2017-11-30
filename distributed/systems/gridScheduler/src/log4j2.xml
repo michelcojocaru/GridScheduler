@@ -5,7 +5,7 @@
 <Configuration status="WARN">
     <Appenders>
         <!-- Async Loggers will auto-flush in batches, so switch off immediateFlush. -->
-        <RandomAccessFile name="RandomAccessFile" fileName="./systems/gridScheduler/logs/gridSchduler.log"
+        <RandomAccessFile name="RandomAccessFile" fileName="./systems/supervisor/logs/gridSchduler.log"
                           immediateFlush="true" append="false">
             <PatternLayout>
                 <Pattern>[%d{dd-MM-yyyy HH:mm:ss}] %p [module: %class{1.}] [thread: %t] [location: %location] event: %m %ex%n</Pattern>
