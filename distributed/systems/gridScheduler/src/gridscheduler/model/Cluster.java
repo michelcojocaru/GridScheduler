@@ -46,7 +46,9 @@ public class Cluster implements Runnable {
 		assert(name != null) : "parameter 'name' cannot be null";
 		assert(supervisor != null) : "parameter 'supervisor' cannot be null";
 		assert(nodeCount > 0) : "parameter 'nodeCount' cannot be smaller or equal to zero";
-		
+
+		logger.warn("Cluster " + name + " created.");
+
 		// Initialize members
 		this.address = name;
 
@@ -69,7 +71,7 @@ public class Cluster implements Runnable {
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
-		logger.warn("Cluster " + this.address + " created.");
+
 		
 	}
 

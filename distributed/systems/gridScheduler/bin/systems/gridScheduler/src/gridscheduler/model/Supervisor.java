@@ -11,11 +11,16 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     // a hashmap linking each grid scheduler to an estimated load
     private ConcurrentHashMap<String, Integer> gridSchedulersLoad = null;
 
+    //
+    private ConcurrentHashMap<GridSchedulerNode,Integer> gridSchedulerNodeConnectedRMs = null;
+
     // list of all the managed grid scheduler nodes
     private ArrayList<GridSchedulerNode> gridSchedulerNodes = null;
 
     // name of this supervisor
     private String address = null;
+
+    private static int minNoOfConnections = Integer.MAX_VALUE;
 
     /**
      * Constructor of supervisor named @param address, which creates @param noOfGsNodes
@@ -27,6 +32,8 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         // preconditions
         assert(noOfGsNodes > 0): "Number of grid scheduler nodes must be positive!";
         assert(address != null): "Supervisor must have a name!";
+
+        this.address = address;
 
         // initialize the grid scheduler nodes that this supervisor is coordinating
         gridSchedulerNodes = new ArrayList<>(noOfGsNodes);
@@ -43,6 +50,13 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         gridSchedulersLoad = new ConcurrentHashMap<>();
         for(GridSchedulerNode gsNode:gridSchedulerNodes){
             gridSchedulersLoad.put(gsNode.getAddress(),0);
+        }
+
+        // initialize the number of connected RMs of each grid scheduler node to 0 because none of the
+        // grid scheduler nodes have RMs connected already.
+        gridSchedulerNodeConnectedRMs = new ConcurrentHashMap<>();
+        for(GridSchedulerNode gsNode:gridSchedulerNodes){
+            gridSchedulerNodeConnectedRMs.put(gsNode,0);
         }
 
 
@@ -67,6 +81,10 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         // get the grid scheduler node that has the least resource managers connected to it
         GridSchedulerNode targetGridSchedulerNode = getLeastLoadedGridSchedulerNode();
 
+        // add +1 to the number of connected RMs of the target grid scheduler node
+        int load = gridSchedulerNodeConnectedRMs.get(targetGridSchedulerNode);
+        gridSchedulerNodeConnectedRMs.put(targetGridSchedulerNode, load + 1);
+
         //register one end of the synchronized socket to the resource manager
         resourceManager.setSyncSocket(targetGridSchedulerNode.getSyncSocket());
 
@@ -74,6 +92,8 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         // to the grid scheduler node that has the least other resource managers connected
         // to it order to balance the distribution.
         targetGridSchedulerNode.getSyncSocket().addMessageReceivedHandler(resourceManager);
+
+
     }
 
     /**
@@ -83,17 +103,15 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
      */
     public GridSchedulerNode getLeastLoadedGridSchedulerNode(){
 
-        int minLoad = Integer.MAX_VALUE;
         GridSchedulerNode leastLoadedGsNode = null;
 
-        for(GridSchedulerNode gsNode:gridSchedulerNodes){
-            int load = gsNode.getNumberOfConnectedRMs();
-            if (load < minLoad){
+        for (GridSchedulerNode gsNode:gridSchedulerNodeConnectedRMs.keySet()) {
+            if (gridSchedulerNodeConnectedRMs.get(gsNode) <= minNoOfConnections) {
                 leastLoadedGsNode = gsNode;
-                minLoad = load;
+                minNoOfConnections = gridSchedulerNodeConnectedRMs.get(gsNode);
             }
         }
-
+        minNoOfConnections = gridSchedulerNodeConnectedRMs.get(leastLoadedGsNode);
         return leastLoadedGsNode;
     }
 

@@ -56,7 +56,9 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	public GridSchedulerNode(String address) {
 		// preconditions
 		assert(address != null) : "parameter 'address' cannot be null";
-		
+
+		logger.warn("GridSchedulerNode " + address + " created.");
+
 		// init members
 		this.address = address;
 		this.resourceManagersLoad = new ConcurrentHashMap<String, Integer>();
@@ -65,17 +67,17 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// create a messaging syncSocket
 		LocalSocket lSocket = new LocalSocket();
 		syncSocket = new SynchronizedSocket(lSocket);
-		syncSocket.addMessageReceivedHandler(this);
-
 		// register the syncSocket under the name of the gridscheduler.
 		// In this way, messages can be sent between components by name.
 		syncSocket.registerGridSchedulerAddress(address);
+		syncSocket.addMessageReceivedHandler(this);
+
 
 		// start the polling thread
 		running = true;
 		pollingThread = new Thread(this);
 		pollingThread.start();
-		logger.warn("GridSchedulerNode " + this.address + " created.");
+
 	}
 	
 	/**

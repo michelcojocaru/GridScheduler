@@ -66,7 +66,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		jobQueueSize = cluster.getNodeCount() + MAX_QUEUE_SIZE;
 
 		// register this RM to the global syncSocket linking it to the supervisor
-		Socket.addMessageReceivedHandler(this);
+		//Socket.addMessageReceivedHandler(this);
 
 		//LocalSocket lSocket = new LocalSocket();
 		//syncSocket = new SynchronizedSocket(lSocket);

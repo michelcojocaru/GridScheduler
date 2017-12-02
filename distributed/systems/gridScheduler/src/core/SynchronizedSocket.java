@@ -15,7 +15,7 @@ public class SynchronizedSocket {
 	private static ArrayList<ResourceManager> resourceManagers = new ArrayList<ResourceManager>(); //good
 	private static GridSchedulerNode gridSchedulerNode = null;
 	//TODO find a use for this name
-	private String gridSchdulerNodeAddress = null;
+	private String gridSchdulerNodeAddress = "Supervisor";
 
 	private final static Logger logger = Logger.getLogger(SynchronizedSocket.class.getName());
 
@@ -25,13 +25,13 @@ public class SynchronizedSocket {
 
 	public void addMessageReceivedHandler(ResourceManager resourceManager) {
 		resourceManagers.add(resourceManager);
-		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchedulerNode.getAddress());
+		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchdulerNodeAddress);//gridSchedulerNode.getAddress());
 
 	}
 
 	public void addMessageReceivedHandler(GridSchedulerNode gsNode) {
 		gridSchedulerNode = gsNode;
-		logger.info("GS: " + gridSchedulerNode.getAddress() + " registered to " + gridSchdulerNodeAddress);
+		logger.info("GS node: " + gridSchedulerNode.getAddress() + " registered to Supervisor");
 
 	}
 
@@ -62,7 +62,7 @@ public class SynchronizedSocket {
 			}
 		}
 	}
-
+	// TODO rewrite this for the current architecture with multiple gs nodes
 	// broadcast the message to all RMs except the one that issued the request
 	private void broadcastToAllRMs(ControlMessage cMessage){
 		for (ResourceManager resourceManager : resourceManagers) {
@@ -112,4 +112,7 @@ public class SynchronizedSocket {
 	}
 
 
+	public int getNoOfConnectedRMs(){
+		return resourceManagers.size();
+	}
 }
