@@ -69,7 +69,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 
 		// register the syncSocket under the name of the gridscheduler.
 		// In this way, messages can be sent between components by name.
-		syncSocket.register(address);
+		syncSocket.registerGridSchedulerAddress(address);
 
 		// start the polling thread
 		running = true;

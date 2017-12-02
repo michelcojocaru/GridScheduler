@@ -15,7 +15,7 @@ public class SynchronizedSocket {
 	private static ArrayList<ResourceManager> resourceManagers = new ArrayList<ResourceManager>(); //good
 	private static GridSchedulerNode gridSchedulerNode = null;
 	//TODO find a use for this name
-	private String socketName = null;
+	private String gridSchdulerNodeAddress = null;
 
 	private final static Logger logger = Logger.getLogger(SynchronizedSocket.class.getName());
 
@@ -31,14 +31,22 @@ public class SynchronizedSocket {
 
 	public void addMessageReceivedHandler(GridSchedulerNode gsNode) {
 		gridSchedulerNode = gsNode;
-		logger.info("GS: " + gridSchedulerNode.getAddress() + " registered to " + socketName);
+		logger.info("GS: " + gridSchedulerNode.getAddress() + " registered to " + gridSchdulerNodeAddress);
 
 	}
 
+	public String getGridSchdulerNodeAddress(){
+		return this.gridSchdulerNodeAddress;
+	}
+
+	public void registerGridSchedulerAddress(String address) {
+		this.gridSchdulerNodeAddress = address;
+	}
+/*
 	public void register(String url){
 		this.socketName = url;
 	}
-
+*/
 	private void send(ControlMessage cMessage,String address) {
 
 		if (cMessage.getDestination().equals(gridSchedulerNode.getAddress())) {
@@ -102,5 +110,6 @@ public class SynchronizedSocket {
 		}
 
 	}
+
 
 }

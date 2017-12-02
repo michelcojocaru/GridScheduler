@@ -98,7 +98,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			ControlMessage controlMessage = new ControlMessage(ControlMessageType.AddJob);
 			//include the sender url into the message
 			controlMessage.setSource(cluster.getName());
-			controlMessage.setDestination(supervisorURL);
+			controlMessage.setDestination(syncSocket.getGridSchdulerNodeAddress());
 			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
 			job.addClusterToVisited(this.cluster.getName());
