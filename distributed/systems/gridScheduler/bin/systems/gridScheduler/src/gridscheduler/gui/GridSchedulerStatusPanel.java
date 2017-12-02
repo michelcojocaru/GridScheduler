@@ -1,6 +1,6 @@
 package gridscheduler.gui;
 
-import gridscheduler.model.GridScheduler;
+import gridscheduler.model.Supervisor;
 
 import java.awt.*;
 
@@ -23,10 +23,11 @@ public class GridSchedulerStatusPanel extends StatusPanel {
 	private final static int panelWidth = 300;
 	private int colWidth = panelWidth / 2;
 
-	private GridScheduler scheduler;
-	
-	public GridSchedulerStatusPanel(GridScheduler scheduler) {
-		this.scheduler = scheduler;
+	//private GridSchedulerNode scheduler;
+	private Supervisor supervisor;
+
+	public GridSchedulerStatusPanel(Supervisor supervisor) {
+		this.supervisor = supervisor;
 		setPreferredSize(new Dimension(panelWidth,50));
 	}
 	
@@ -45,11 +46,11 @@ public class GridSchedulerStatusPanel extends StatusPanel {
 	    int y = padding + fontHeight;
 	    
 	    g.drawString("Scheduler name ", x, y);
-	    g.drawString("" + scheduler.getAddress(), x + colWidth, y);
+	    g.drawString("" + supervisor.getAddress(), x + colWidth, y);
 	    y += fontHeight;
 	    
 	    g.drawString("Jobs waiting ", x, y);
-	    g.drawString("" + scheduler.getWaitingJobs(), x + colWidth, y);
+	    g.drawString("" + supervisor.getWaitingJobs(), x + colWidth, y);
 	    y += fontHeight;
 
 

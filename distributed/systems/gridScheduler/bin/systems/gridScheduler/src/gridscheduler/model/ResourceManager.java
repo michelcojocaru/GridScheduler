@@ -2,8 +2,8 @@ package gridscheduler.model;
 
 import core.IMessageReceivedHandler;
 import core.Message;
+import core.Socket;
 import core.SynchronizedSocket;
-import example.LocalSocket;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -35,11 +35,11 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	public static final int MAX_QUEUE_SIZE = 32;
 
 	// Scheduler url
-	private String gridSchedulerURL = null;
+	private String supervisorURL = null;
 
-	private SynchronizedSocket socket;
+	private SynchronizedSocket syncSocket;
 
-	private final static Logger logger = Logger.getLogger(GridScheduler.class.getName());
+	private final static Logger logger = Logger.getLogger(GridSchedulerNode.class.getName());
 
 	/**
 	 * Constructs a new ResourceManager object.
@@ -65,11 +65,14 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		// nodes we can assume a node will become available soon to handle that job.
 		jobQueueSize = cluster.getNodeCount() + MAX_QUEUE_SIZE;
 
-		LocalSocket lSocket = new LocalSocket();
-		socket = new SynchronizedSocket(lSocket);
-		socket.register(name);
+		// register this RM to the global syncSocket linking it to the supervisor
+		Socket.addMessageReceivedHandler(this);
 
-		socket.addMessageReceivedHandler(this);
+		//LocalSocket lSocket = new LocalSocket();
+		//syncSocket = new SynchronizedSocket(lSocket);
+		//syncSocket.register(name);
+
+		//syncSocket.addMessageReceivedHandler(this);
 	}
 
 	/**
@@ -87,19 +90,19 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	public void addJob(Job job) {
 		// check preconditions
 		assert(job != null) : "the parameter 'job' cannot be null";
-		assert(gridSchedulerURL != null) : "No grid scheduler URL has been set for this resource manager";
+		assert(supervisorURL != null) : "No grid scheduler URL has been set for this resource manager";
 
 		// if the jobqueue is full, offload the job to the grid scheduler
 		if (jobQueue.size() >= jobQueueSize) {
-
+			// TODO rewrite this in order to use syncSocket instead of global syncSocket once the link is up
 			ControlMessage controlMessage = new ControlMessage(ControlMessageType.AddJob);
 			//include the sender url into the message
 			controlMessage.setSource(cluster.getName());
-			controlMessage.setDestination(gridSchedulerURL);
+			controlMessage.setDestination(supervisorURL);
 			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
 			job.addClusterToVisited(this.cluster.getName());
-			socket.sendMessage(controlMessage, "localsocket://" + gridSchedulerURL);
+			syncSocket.sendMessage(controlMessage, "localsocket://" + supervisorURL);
 
 
 			// otherwise store it in the local queue
@@ -174,7 +177,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		nMessage.setJob(job);
 
 		logger.info("Job " + job.getId() + " done on " + this.cluster.getName());
-		socket.sendMessage(nMessage,"localsocket://" + getGridSchedulerAddress());
+		syncSocket.sendMessage(nMessage,"localsocket://" + getGridSchedulerAddress());
 
 	}
 
@@ -182,7 +185,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * @return the url of the grid scheduler this RM is connected to 
 	 */
 	public String getGridSchedulerAddress() {
-		return gridSchedulerURL;
+		return supervisorURL;
 	}
 
 	public String getName(){
@@ -200,22 +203,31 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	/**
 	 * Connect to a grid scheduler
 	 * <p>
-	 * pre: the parameter 'gridSchedulerURL' must not be null
-	 * @param gridSchedulerURL
+	 * pre: the parameter 'supervisorURL' must not be null
+	 * @param supervisorURL
 	 */
-	public void connectToGridScheduler(String gridSchedulerURL) {
+	public void connectToAGridSchedulerNode(String supervisorURL) {
 
 		// preconditions
-		assert(gridSchedulerURL != null) : "the parameter 'gridSchedulerURL' cannot be null"; 
+		assert(supervisorURL != null) : "the parameter 'supervisorURL' cannot be null";
 
-		this.gridSchedulerURL = gridSchedulerURL;
+		this.supervisorURL = supervisorURL;
 
 		ControlMessage message = new ControlMessage(ControlMessageType.ResourceManagerJoin);
 		message.setSource(cluster.getName());
-		message.setDestination(gridSchedulerURL);	//redundant I know...
+		message.setDestination(supervisorURL);	//redundant I know...
 
-		socket.sendMessage(message, "localsocket://" + gridSchedulerURL);
+		Socket.addMessageReceivedHandler(this);
+		//syncSocket.sendMessage(message, "localsocket://" + supervisorURL);
 
+	}
+
+	/**
+	 * Registers one end of the synchronized socket to this resource manager
+	 * @param syncSocket
+	 */
+	public void setSyncSocket(SynchronizedSocket syncSocket) {
+		this.syncSocket = syncSocket;
 	}
 
 
@@ -254,7 +266,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
 			replyMessage.setLoad(jobQueue.size()); //cluster.countFreeNodes())
 
-			socket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
+			syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 
 		}
 
@@ -270,6 +282,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		}
 
 	}
+
 
 
 }

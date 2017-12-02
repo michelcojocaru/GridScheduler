@@ -39,12 +39,12 @@ public class Cluster implements Runnable {
 	 * </DL>
 	 * @param nodeCount the number of nodes in this cluster
 	 * @param name the name of this cluster
-	 * @param gridScheduler
+	 * @param supervisor
 	 */
-	public Cluster(String name, GridScheduler gridScheduler, int nodeCount) throws IOException {
+	public Cluster(String name, Supervisor supervisor, int nodeCount) throws IOException {
 		// Preconditions
 		assert(name != null) : "parameter 'name' cannot be null";
-		assert(gridScheduler != null) : "parameter 'gridSchedulerURL' cannot be null";
+		assert(supervisor != null) : "parameter 'supervisor' cannot be null";
 		assert(nodeCount > 0) : "parameter 'nodeCount' cannot be smaller or equal to zero";
 		
 		// Initialize members
@@ -54,7 +54,7 @@ public class Cluster implements Runnable {
 		
 		// Initialize the resource manager for this cluster
 		resourceManager = new ResourceManager(this);
-		resourceManager.connectToGridScheduler(gridScheduler.getAddress());
+		resourceManager.connectToAGridSchedulerNode(supervisor.getAddress());
 
 		// Initialize the nodes 
 		for (int i = 0; i < nodeCount; i++) {

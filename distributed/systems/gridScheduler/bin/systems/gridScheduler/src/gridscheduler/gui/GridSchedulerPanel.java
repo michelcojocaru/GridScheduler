@@ -1,6 +1,7 @@
 package gridscheduler.gui;
 
-import gridscheduler.model.GridScheduler;
+import gridscheduler.model.GridSchedulerNode;
+import gridscheduler.model.Supervisor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,9 +38,9 @@ public class GridSchedulerPanel extends JFrame implements Runnable {
 	 * Constructs a new DebugPanel object. 
 	 * Adds a status panel that displays the scheduler to the window.
 	 * This is done so that the scheduler panel will always be on top.
-	 * @param scheduler The scheduler that is monitored by this Panel
+	 * @param supervisor The scheduler that is monitored by this Panel
 	 */
-	public GridSchedulerPanel(GridScheduler scheduler) {
+	public GridSchedulerPanel(Supervisor supervisor) {
 		super("Status");
 		this.setSize(340, 680);
 		this.setResizable(false);
@@ -49,7 +50,7 @@ public class GridSchedulerPanel extends JFrame implements Runnable {
 		statusPanels = new ArrayList<StatusPanel>();
 
 		// Create the gridscheduler status panel and add it to the frame
-		GridSchedulerStatusPanel schedulerStatusPanel = new GridSchedulerStatusPanel(scheduler);
+		GridSchedulerStatusPanel schedulerStatusPanel = new GridSchedulerStatusPanel(supervisor);
 		statusPanels.add(schedulerStatusPanel);
 		this.add(schedulerStatusPanel);
 		// Place and resize the status panel

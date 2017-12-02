@@ -3,8 +3,8 @@ package gridscheduler;
 import gridscheduler.gui.ClusterStatusPanel;
 import gridscheduler.gui.GridSchedulerPanel;
 import gridscheduler.model.Cluster;
-import gridscheduler.model.GridScheduler;
 import gridscheduler.model.Job;
+import gridscheduler.model.Supervisor;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
@@ -51,13 +51,17 @@ public class Simulation implements Runnable,KeyListener {
 
 		BasicConfigurator.configure();
 
-		GridScheduler scheduler;
+		// TODO if something goes wrong recheck this logic
+		//GridSchedulerNode scheduler;
+		Supervisor supervisor = null;
 
 		// Setup the model. Create a grid scheduler and a set of clusters.
-		scheduler = new GridScheduler("scheduler1");
+		//scheduler = new GridSchedulerNode("scheduler1");
+		supervisor = new Supervisor("Supervisor",6); // TODO change this in order to have variable number of grid scheduler nodes
 
 		// Create a new gridscheduler panel so we can monitor our components
-		gridSchedulerPanel = new GridSchedulerPanel(scheduler);
+		//gridSchedulerPanel = new GridSchedulerPanel(scheduler);
+		gridSchedulerPanel = new GridSchedulerPanel(supervisor);
 		gridSchedulerPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		logger.info("Simulation started.");
@@ -65,7 +69,7 @@ public class Simulation implements Runnable,KeyListener {
 		// Create the clusters and nods
 		clusters = new Cluster[nrClusters];
 		for (int i = 0; i < nrClusters; i++) {
-			clusters[i] = new Cluster("cluster" + i, scheduler, nrNodes);
+			clusters[i] = new Cluster("cluster" + i, supervisor, nrNodes);
 
 			// Now create a cluster status panel for each cluster inside this gridscheduler
 			ClusterStatusPanel clusterReporter = new ClusterStatusPanel(clusters[i]);
@@ -86,7 +90,7 @@ public class Simulation implements Runnable,KeyListener {
 			cluster.stopPollThread();
 
 		// Stop grid scheduler
-		scheduler.stopPollThread();
+		supervisor.stopPollThread();
 	}
 
 	/**
@@ -103,8 +107,8 @@ public class Simulation implements Runnable,KeyListener {
 
 			// Uncomment one at a time in order to simulate different behaviours
 
-			//evenLoad(jobId); // randomly distributes jobs to cluster (nearly uniform distribution)
-			unEvenLoad(jobId,5); //TODO make the ratio parameterized (extreme high load)
+			evenLoad(jobId); // randomly distributes jobs to cluster (nearly uniform distribution)
+			//unEvenLoad(jobId,5); //TODO make the ratio parameterized (extreme high load)
 			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
