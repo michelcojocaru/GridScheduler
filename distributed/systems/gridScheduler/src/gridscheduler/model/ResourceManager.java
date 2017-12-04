@@ -97,12 +97,12 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			// TODO rewrite this in order to use syncSocket instead of global syncSocket once the link is up
 			ControlMessage controlMessage = new ControlMessage(ControlMessageType.AddJob);
 			//include the sender url into the message
-			controlMessage.setSource(cluster.getName());
+			controlMessage.setSource(this.cluster.getName());
 			controlMessage.setDestination(syncSocket.getGridSchdulerNodeAddress());
 			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
 			job.addClusterToVisited(this.cluster.getName());
-			syncSocket.sendMessage(controlMessage, "localsocket://" + supervisorURL);
+			syncSocket.sendMessage(controlMessage, "localsocket://" + syncSocket.getGridSchdulerNodeAddress());
 
 
 			// otherwise store it in the local queue
@@ -262,9 +262,9 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyLoad);
 
-			replyMessage.setSource(cluster.getName());
+			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
-			replyMessage.setLoad(jobQueue.size()); //cluster.countFreeNodes())
+			replyMessage.setLoad(jobQueue.size()); //cluster.countFreeNodes()) // TODO change this to use moving average
 
 			syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 

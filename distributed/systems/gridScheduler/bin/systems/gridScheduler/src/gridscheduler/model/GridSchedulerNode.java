@@ -125,21 +125,28 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// no jobs are scheduled to it until we know the actual load
 		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin) {
 			resourceManagersLoad.put(controlMessage.getSource(), Integer.MAX_VALUE);
-			logger.info("GS: " + this.getAddress() + " received a join request from RM: " + controlMessage.getSource());
+			for (String name: resourceManagersLoad.keySet()){
+
+				String key =name.toString();
+				String value = resourceManagersLoad.get(name).toString();
+				System.out.println(key + " " + value);
+
+
+			}
+			System.out.println("-------------------------");
+			logger.info("GS: " + controlMessage.getDestination() + " received a join request from RM: " + controlMessage.getSource());
 		}
 		// resource manager wants to offload a job to us		WHAT THE FUCK ?
 		if (controlMessage.getType() == ControlMessageType.AddJob) {
 			//TODO log the GS also into the visited cluster
-			logger.info("GS: " + this.getAddress() + " received a job from RM: " + controlMessage.getSource());
+			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
 			jobQueue.add(controlMessage.getJob());
 		}
 			
 		// resource manager wants to offload a job to us 		WHAT THE FUCK ? It means to get the load from the rm
 		if (controlMessage.getType() == ControlMessageType.ReplyLoad) {
-			int load = controlMessage.getLoad();
-			String address = controlMessage.getSource();
-			logger.info("GS: " + this.getAddress() + " received the load of: " + load + "% from RM: " + address);
-			resourceManagersLoad.put(address, load);
+			logger.info("GS: " + controlMessage.getDestination() + " received the load of: " + controlMessage.getLoad() + "% from RM: " + controlMessage.getSource());
+			resourceManagersLoad.put(controlMessage.getSource(), controlMessage.getLoad());
 		}
 
 		// one of the clusters notified the GS that it completed a job
@@ -181,13 +188,12 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			{
 				ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestLoad);
 
-				cMessage.setUrl(this.getAddress());
+				//cMessage.setUrl(this.getAddress());
 				cMessage.setSource(this.getAddress());
 				cMessage.setDestination(rmAdress);
 
 				syncSocket.sendMessage(cMessage, "localsocket://" + rmAdress);
 			}
-
 
 			// schedule waiting messages to the different clusters
 			for (Job job : jobQueue)
@@ -244,4 +250,5 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	public int getNumberOfConnectedRMs() {
 		return resourceManagersLoad.size();
 	}
+
 }

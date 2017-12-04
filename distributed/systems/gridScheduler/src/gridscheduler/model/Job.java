@@ -43,7 +43,7 @@ public class Job {
 
 	public void addClusterToVisited(String cluster){
 		visitedClusters.add(cluster);
-		logger.info("Cluster: " + cluster + " was added to Jobs " + this.getId() + " visited queue.");
+		logger.info("Cluster: " + cluster + " was added to Job " + this.getId() + " visited queue.");
 	}
 
 	public void removeClusterFromVisited(String cluster){

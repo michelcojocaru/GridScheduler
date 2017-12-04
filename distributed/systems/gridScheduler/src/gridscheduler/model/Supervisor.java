@@ -111,7 +111,12 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
                 minNoOfConnections = gridSchedulerNodeConnectedRMs.get(gsNode);
             }
         }
-        minNoOfConnections = gridSchedulerNodeConnectedRMs.get(leastLoadedGsNode);
+        //if(leastLoadedGsNode != null) {
+            //TODO solve this (4 a low no of gsnodes leastLoadedGsNode == null)
+            minNoOfConnections = gridSchedulerNodeConnectedRMs.get(leastLoadedGsNode);
+        //}else{
+        //    return gridSchedulerNodes.get(0);
+        //}
         return leastLoadedGsNode;
     }
 

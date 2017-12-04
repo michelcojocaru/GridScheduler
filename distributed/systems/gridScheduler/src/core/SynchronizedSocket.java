@@ -12,8 +12,8 @@ import java.util.ArrayList;
 public class SynchronizedSocket {
 
 	private LocalSocket localSocket = null;
-	private static ArrayList<ResourceManager> resourceManagers = new ArrayList<ResourceManager>(); //good
-	private static GridSchedulerNode gridSchedulerNode = null;
+	private ArrayList<ResourceManager> resourceManagers = new ArrayList<ResourceManager>(); //good
+	private GridSchedulerNode gridSchedulerNode = null;
 	//TODO find a use for this name
 	private String gridSchdulerNodeAddress = "Supervisor";
 
@@ -25,8 +25,19 @@ public class SynchronizedSocket {
 
 	public void addMessageReceivedHandler(ResourceManager resourceManager) {
 		resourceManagers.add(resourceManager);
-		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchdulerNodeAddress);//gridSchedulerNode.getAddress());
 
+
+		// TODO investigate this (written monday before class)
+		if(gridSchedulerNode != null){
+			ControlMessage joinRequestMessage = new ControlMessage(ControlMessageType.ResourceManagerJoin);
+			joinRequestMessage.setSource(resourceManager.getName());
+			joinRequestMessage.setDestination(gridSchdulerNodeAddress);
+
+
+			gridSchedulerNode.onMessageReceived(joinRequestMessage);
+		}
+
+		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchdulerNodeAddress);//gridSchedulerNode.getAddress());
 	}
 
 	public void addMessageReceivedHandler(GridSchedulerNode gsNode) {
@@ -55,7 +66,7 @@ public class SynchronizedSocket {
 
 			for (ResourceManager resourceManager : resourceManagers) {
 				if (cMessage.getDestination().equals(resourceManager.getName())) {
-					logger.info("GS: " + cMessage.getSource() + " is sending a message to RM: " + resourceManager.getName());
+					logger.info("GS: " + cMessage.getSource() + " is sending a " + cMessage.getType() + " message to RM: " + resourceManager.getName());
 					resourceManager.onMessageReceived(cMessage);
 					break;
 				}
@@ -78,22 +89,42 @@ public class SynchronizedSocket {
 		// RM to GS / GS to RM
 		if(cMessage.getType() == ControlMessageType.AddJob){
 
+/*
 			if(gridSchedulerNode != null || !resourceManagers.isEmpty()){
 				send(cMessage,address);
+			}
+*/
+			if(cMessage.getDestination().equals(gridSchedulerNode.getAddress())){
+				gridSchedulerNode.onMessageReceived(cMessage);
+			}else{
+				for(ResourceManager resourceManager:resourceManagers){
+					if(resourceManager.getName().equals(cMessage.getDestination())){
+						resourceManager.onMessageReceived(cMessage);
+						break;
+					}
+				}
 			}
 		}
 
 		if(cMessage.getType() == ControlMessageType.RequestLoad){
 
-			//System.out.println("GS to RM - RequestLoad ");
+			System.out.println("GS: " + cMessage.getSource() + " to RM " + cMessage.getDestination()+ "- RequestLoad: ");
+/*
 			if(!resourceManagers.isEmpty()){
 				send(cMessage,address);
+			}
+*/
+			for(ResourceManager resourceManager:resourceManagers){
+				if(resourceManager.getName().equals(cMessage.getDestination())){
+					resourceManager.onMessageReceived(cMessage);
+					break;
+				}
 			}
 		}
 
 		if(cMessage.getType() == ControlMessageType.ReplyLoad){
 
-			//System.out.println("RM to GS - ReplyLoad");
+			System.out.println("RM " + cMessage.getSource() + "to GS " + cMessage.getDestination() + "- ReplyLoad");
 			if(gridSchedulerNode != null){
 				gridSchedulerNode.onMessageReceived(cMessage);
 			}
@@ -101,12 +132,16 @@ public class SynchronizedSocket {
 
 		if(cMessage.getType() == ControlMessageType.ResourceManagerJoin){
 
-			//System.out.println("RM connected to GS - ResourceManagerJoin");
-			send(cMessage,address);
+			System.out.println("RM " + cMessage.getSource() + "connected to GS " + cMessage.getDestination() + "- ResourceManagerJoin");
+			if(cMessage.getDestination().equals(gridSchedulerNode.getAddress())){
+				gridSchedulerNode.onMessageReceived(cMessage);
+			}
+			// send(cMessage,address);
 		}
 
 		if(cMessage.getType() == ControlMessageType.NotifyJobCompletion){
-			broadcastToAllRMs(cMessage);
+			System.out.println("Notify Job Completion from " + cMessage.getSource() + " to " + cMessage.getDestination());
+			//broadcastToAllRMs(cMessage);
 		}
 
 	}
