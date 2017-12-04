@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Simulation implements Runnable,KeyListener {
 	// Number of clusters in the simulation
-	private final static int nrClusters = 5;
+	private final static int nrClusters = 4;
 
 	// Number of nodes per cluster in the simulation
 	private final static int nrNodes = 12;
@@ -57,7 +57,7 @@ public class Simulation implements Runnable,KeyListener {
 
 		// Setup the model. Create a grid scheduler and a set of clusters.
 		//scheduler = new GridSchedulerNode("scheduler1");
-		supervisor = new Supervisor("Supervisor",6); // TODO change this in order to have variable number of grid scheduler nodes
+		supervisor = new Supervisor("Supervisor",2); // TODO change this in order to have variable number of grid scheduler nodes
 
 		// Create a new gridscheduler panel so we can monitor our components
 		//gridSchedulerPanel = new GridSchedulerPanel(scheduler);

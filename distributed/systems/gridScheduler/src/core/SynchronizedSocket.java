@@ -24,15 +24,13 @@ public class SynchronizedSocket {
 	}
 
 	public void addMessageReceivedHandler(ResourceManager resourceManager) {
+
 		resourceManagers.add(resourceManager);
 
-
-		// TODO investigate this (written monday before class)
 		if(gridSchedulerNode != null){
 			ControlMessage joinRequestMessage = new ControlMessage(ControlMessageType.ResourceManagerJoin);
 			joinRequestMessage.setSource(resourceManager.getName());
 			joinRequestMessage.setDestination(gridSchdulerNodeAddress);
-
 
 			gridSchedulerNode.onMessageReceived(joinRequestMessage);
 		}

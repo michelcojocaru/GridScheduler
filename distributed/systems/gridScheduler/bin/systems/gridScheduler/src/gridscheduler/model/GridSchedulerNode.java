@@ -125,18 +125,9 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// no jobs are scheduled to it until we know the actual load
 		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin) {
 			resourceManagersLoad.put(controlMessage.getSource(), Integer.MAX_VALUE);
-			for (String name: resourceManagersLoad.keySet()){
-
-				String key =name.toString();
-				String value = resourceManagersLoad.get(name).toString();
-				System.out.println(key + " " + value);
-
-
-			}
-			System.out.println("-------------------------");
 			logger.info("GS: " + controlMessage.getDestination() + " received a join request from RM: " + controlMessage.getSource());
 		}
-		// resource manager wants to offload a job to us		WHAT THE FUCK ?
+		// resource manager wants to offload a job to us
 		if (controlMessage.getType() == ControlMessageType.AddJob) {
 			//TODO log the GS also into the visited cluster
 			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
@@ -198,24 +189,28 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			// schedule waiting messages to the different clusters
 			for (Job job : jobQueue)
 			{
-				String leastLoadedRM =  getLeastLoadedRM();
-				
-				if (leastLoadedRM != null) {
-				
-					ControlMessage cMessage = new ControlMessage(ControlMessageType.AddJob);
-					cMessage.setJob(job);
-					cMessage.setSource(this.getAddress());
-					cMessage.setDestination(leastLoadedRM);
+				// replicate the job on at least 2 clusters simultaneously
+				for(int i = 0; i < 2; i++) {
 
-					syncSocket.sendMessage(cMessage, "localsocket://" + leastLoadedRM);
-					logger.info("[GridSchedulerNode] GS " + this.getAddress() +" sends a job to RM: " + leastLoadedRM);
-					
-					jobQueue.remove(job);
-					
-					// increase the estimated load of that RM by 1 (because we just added a job)
-					int load = resourceManagersLoad.get(leastLoadedRM);
-					resourceManagersLoad.put(leastLoadedRM, load+1);
-					
+					String leastLoadedRM = getLeastLoadedRM();
+
+					if (leastLoadedRM != null) {
+
+						ControlMessage cMessage = new ControlMessage(ControlMessageType.AddJob);
+						cMessage.setJob(job);
+						cMessage.setSource(this.getAddress());
+						cMessage.setDestination(leastLoadedRM);
+
+						syncSocket.sendMessage(cMessage, "localsocket://" + leastLoadedRM);
+						logger.info("[GridSchedulerNode] GS " + this.getAddress() + " sends job " + cMessage.getJob().getId() + " to RM: " + leastLoadedRM);
+
+						jobQueue.remove(job);
+
+						// increase the estimated load of that RM by 1 (because we just added a job)
+						int load = resourceManagersLoad.get(leastLoadedRM);
+						resourceManagersLoad.put(leastLoadedRM, load + 1);
+
+					}
 				}
 				
 			}

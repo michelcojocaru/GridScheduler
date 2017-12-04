@@ -103,7 +103,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
      */
     public GridSchedulerNode getLeastLoadedGridSchedulerNode(){
 
-        GridSchedulerNode leastLoadedGsNode = null;
+        GridSchedulerNode leastLoadedGsNode = gridSchedulerNodes.get(0);
 
         for (GridSchedulerNode gsNode:gridSchedulerNodeConnectedRMs.keySet()) {
             if (gridSchedulerNodeConnectedRMs.get(gsNode) <= minNoOfConnections) {
@@ -111,12 +111,10 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
                 minNoOfConnections = gridSchedulerNodeConnectedRMs.get(gsNode);
             }
         }
-        //if(leastLoadedGsNode != null) {
-            //TODO solve this (4 a low no of gsnodes leastLoadedGsNode == null)
-            minNoOfConnections = gridSchedulerNodeConnectedRMs.get(leastLoadedGsNode);
-        //}else{
-        //    return gridSchedulerNodes.get(0);
-        //}
+
+        //TODO solve this (4 a low no of gsnodes leastLoadedGsNode == null)
+        minNoOfConnections = gridSchedulerNodeConnectedRMs.get(leastLoadedGsNode);
+
         return leastLoadedGsNode;
     }
 
