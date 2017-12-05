@@ -122,7 +122,7 @@ public class Cluster implements Runnable {
 		// so we just return null
 		return null;
 	}
-/*
+
 	public int countFreeNodes(){
 		int nrNodes = this.getNodes().size();
 		int count = 0;
@@ -130,9 +130,20 @@ public class Cluster implements Runnable {
 			if (node.getStatus() == NodeStatus.Idle){
 				count++;
 			}
-		return nrNodes - count;
+		return count;
+		//return nrNodes - count;
 	}
-*/
+	public int countRunningNodes(){
+		int nrNodes = this.getNodes().size();
+		int count = 0;
+		for (Node node : nodes)
+			if (node.getStatus() == NodeStatus.Busy){
+				count++;
+			}
+		return count;
+		//return nrNodes - count;
+	}
+
 	/**
 	 * Polling thread runner. This function polls each node in the system repeatedly. Polling
 	 * is needed to make each node check its internal state - whether a running job is 

@@ -22,19 +22,30 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 
 
 	// job queue
-	private ConcurrentLinkedQueue<Job> jobQueue;
+	private ConcurrentLinkedQueue<Job> jobQueue = null;
 	
 	// local address
 	private final String address;
 
 	// communications syncSocket
-	private SynchronizedSocket syncSocket;
+	private SynchronizedSocket syncSocket = null;
 	
 	// a hashmap linking each resource manager to an estimated load
-	private ConcurrentHashMap<String, Integer> resourceManagersLoad;
+	private ConcurrentHashMap<String, Integer> resourceManagersLoad = null;
+
+	// the average load of all clusters connected to this GS node
+	private int averageLoad = 0;
+
+	private boolean jobReplicationEnabled = false;
+
 
 	// polling frequency, 1hz
-	private long pollSleep = 1000;
+	private long pollSleep = 100;//1000
+
+	// toggle for indicating the primary/replica GS node
+	private boolean isReplica;
+
+	private GridSchedulerNode replica = null;
 	
 	// polling thread
 	private Thread pollingThread;
@@ -45,7 +56,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	private final static Logger logger = Logger.getLogger(GridSchedulerNode.class.getName());
 	
 	/**
-	 * Constructs a new GridSchedulerNode object at a given address.
+	 * Constructs a new REPLICA GridSchedulerNode object at a given address.
 	 * <p>
 	 * <DL>
 	 * <DT><B>Preconditions:</B>
@@ -53,15 +64,51 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	 * </DL>
 	 * @param address the gridscheduler's address to register at
 	 */
-	public GridSchedulerNode(String address) {
+	public GridSchedulerNode(String address, boolean jobReplicationEnabled) {
 		// preconditions
 		assert(address != null) : "parameter 'address' cannot be null";
 
 		logger.warn("GridSchedulerNode " + address + " created.");
 
+		//
+		isReplica = true;
+
+		this.jobReplicationEnabled = jobReplicationEnabled;
+
+		// init members
+		this.address = address;
+
+
+
+		// start the polling thread
+		running =  !isReplica;
+		pollingThread = new Thread(this);
+		pollingThread.start();
+
+	}
+	/**
+	 * Constructs a new PRIMARY GridSchedulerNode object at a given address.
+	 * <p>
+	 * <DL>
+	 * <DT><B>Preconditions:</B>
+	 * <DD>parameter <CODE>address</CODE> cannot be null
+	 * </DL>
+	 * @param address the gridscheduler's address to register at
+	 */
+	public GridSchedulerNode(String address, GridSchedulerNode replica, boolean jobReplicationEnabled) {
+		// preconditions
+		assert(address != null) : "parameter 'address' cannot be null";
+
+		logger.warn("GridSchedulerNode " + address + " created.");
+
+		// set this instance as PRIMARY GS node
+		isReplica = false;
+		this.replica = replica;
+
 		// init members
 		this.address = address;
 		this.resourceManagersLoad = new ConcurrentHashMap<String, Integer>();
+		this.jobReplicationEnabled = jobReplicationEnabled;
 		this.jobQueue = new ConcurrentLinkedQueue<Job>();
 
 		// create a messaging syncSocket
@@ -73,11 +120,58 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		syncSocket.addMessageReceivedHandler(this);
 
 
+		replica.connectToReplica(this);
+
+
 		// start the polling thread
-		running = true;
+		running = !isReplica;
 		pollingThread = new Thread(this);
 		pollingThread.start();
 
+	}
+
+	public void connectToReplica(GridSchedulerNode replica){
+		this.replica = replica;
+		this.jobQueue = replica.getJobQueue();
+		// take the reference of sync socket from the replica
+		this.syncSocket = replica.getSyncSocket();
+	}
+
+	public ConcurrentLinkedQueue<Job> getJobQueue() {
+		return jobQueue;
+	}
+
+	public void setIsReplicaStatus(boolean status){
+		this.isReplica = status;
+	}
+
+	public boolean getIsReplicaStatus(){
+		return this.isReplica;
+	}
+
+	public void toggleStatus() {
+
+		isReplica = !isReplica;
+		running = !running;
+		replica.isReplica = !replica.isReplica;
+		replica.running = !replica.running;
+
+		//replica.jobQueue = this.jobQueue;
+		if (this.isReplica){
+			replica.registerToSyncSocket(this);
+			logger.warn("GS node " + replica.getAddress() + " became ACTIVE.");
+		}else {
+			this.registerToSyncSocket(replica);
+			logger.warn("GS node " + this.getAddress() + " became ACTIVE.");
+		}
+
+
+	}
+
+	public void registerToSyncSocket(GridSchedulerNode gsNode){
+		this.syncSocket = gsNode.getSyncSocket();
+		this.syncSocket.registerGridSchedulerAddress(this.address);
+		this.syncSocket.addMessageReceivedHandler(this);
 	}
 	
 	/**
@@ -113,7 +207,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	 * </DL> 
 	 * @param message a message
 	 */
-	public void onMessageReceived(Message message) {
+	public synchronized void onMessageReceived(Message message) {
 		// preconditions
 		assert(message instanceof ControlMessage) : "parameter 'message' should be of type ControlMessage";
 		assert(message != null) : "parameter 'message' cannot be null";
@@ -131,13 +225,23 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		if (controlMessage.getType() == ControlMessageType.AddJob) {
 			//TODO log the GS also into the visited cluster
 			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
-			jobQueue.add(controlMessage.getJob());
+			Job job = controlMessage.getJob();
+			job.addClusterToVisited(this.getAddress());
+			jobQueue.add(job);
 		}
 			
-		// resource manager wants to offload a job to us 		WHAT THE FUCK ? It means to get the load from the rm
+		// one of the resource managers responded to a load request from this GS node
 		if (controlMessage.getType() == ControlMessageType.ReplyLoad) {
 			logger.info("GS: " + controlMessage.getDestination() + " received the load of: " + controlMessage.getLoad() + "% from RM: " + controlMessage.getSource());
 			resourceManagersLoad.put(controlMessage.getSource(), controlMessage.getLoad());
+		}
+
+		// one of the resource managers responded to a job request from this GS node
+		if (controlMessage.getType() == ControlMessageType.ReplyJob){
+			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
+			Job job = controlMessage.getJob();
+			job.addClusterToVisited(this.getAddress());
+			jobQueue.add(controlMessage.getJob());
 		}
 
 		// one of the clusters notified the GS that it completed a job
@@ -156,14 +260,11 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		int minLoad = Integer.MAX_VALUE;
 		
 		// loop over all resource managers, and pick the one with the lowest load
-		for (String key : resourceManagersLoad.keySet()) {
-			// check the load to be less than 100%
-			//if(resourceManagersLoad.get(key) < 100) {
-				if (resourceManagersLoad.get(key) <= minLoad) {
-					ret = key;
-					minLoad = resourceManagersLoad.get(key);
-				}
-			//}
+		for (String rmAddress : resourceManagersLoad.keySet()) {
+			if (resourceManagersLoad.get(rmAddress) <= minLoad) {
+				ret = rmAddress;
+				minLoad = resourceManagersLoad.get(rmAddress);
+			}
 		}
 		
 		return ret;		
@@ -177,14 +278,11 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 
 		// loop over all resource managers, and pick the one
 		// with the lowest load that hasn't been already chosen
-		for(String key : resourceManagersLoad.keySet()){
-			// check the load to be less than 100%
-			//if(resourceManagersLoad.get(key) < 100) {
-				if (resourceManagersLoad.get(key) <= minLoad && !key.equals(leastLoadedRM)) {
-					ret = key;
-					minLoad = resourceManagersLoad.get(key);
-				}
-			//}
+		for(String rmAddress : resourceManagersLoad.keySet()){
+			if (resourceManagersLoad.get(rmAddress) <= minLoad && !rmAddress.equals(leastLoadedRM)) {
+				ret = rmAddress;
+				minLoad = resourceManagersLoad.get(rmAddress);
+			}
 		}
 
 		return ret;
@@ -211,6 +309,43 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 	}
 
+	public int calculateAverageLoad(){
+		int average = 0;
+
+		for(String rmAddress : resourceManagersLoad.keySet()){
+			average += resourceManagersLoad.get(rmAddress);
+		}
+		//average /= (resourceManagersLoad.size() > 0 ? resourceManagersLoad.size() : 1);
+		if (resourceManagersLoad.size() == 0){
+			return 0;
+		}
+		average /= resourceManagersLoad.size();
+		return average;
+	}
+
+	public void sendJobRequest(String target){
+
+		if (target != null) {
+
+			ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestJob);
+			cMessage.setSource(this.getAddress());
+			cMessage.setDestination(target);
+
+			syncSocket.sendMessage(cMessage, "localsocket://" + target);
+			logger.info("[GridSchedulerNode] GS " + this.getAddress() + " request job from RM: " + target);
+
+		}
+	}
+
+	private void requestJobFromRMwithHigherThanAverageLoad(int average) {
+		for(String rmAddress:resourceManagersLoad.keySet()){
+			if(resourceManagersLoad.get(rmAddress) > average){
+				sendJobRequest(rmAddress);
+			}
+		}
+
+	}
+
 	/**
 	 * Polling thread runner. This thread polls each resource manager in turn to get its load,
 	 * then offloads any job in the waiting queue to that resource manager
@@ -227,20 +362,33 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 
 				syncSocket.sendMessage(cMessage, "localsocket://" + rmAdress);
 			}
+
+			// TODO take the job from the RM that has a load higher than the average of all
+			// RMs and dispach it to the RM that has a load lower than the average of all connected RMs
+			averageLoad = calculateAverageLoad();
+
+			requestJobFromRMwithHigherThanAverageLoad(averageLoad);
+
+
 			//TODO verify that the RM can accept any more jobs
+
+
 			// schedule waiting messages to the different clusters
 			for (Job job : jobQueue) {
 
 				String leastLoadedRM = getLeastLoadedRM();
+				// check the load to be less than 100%
 				if(resourceManagersLoad.get(leastLoadedRM) < 100) {
 					sendReplicatedJob(leastLoadedRM, job);
 				}
-
-				// replicate the job on at least one more cluster simultaneously
-				if(resourceManagersLoad.size() > 1) {
-					String secondLeastLoadedRM = getSecondLeastLoadedRM(leastLoadedRM);
-					if(resourceManagersLoad.get(secondLeastLoadedRM) < 100) {
-						sendReplicatedJob(secondLeastLoadedRM, job);
+				if(jobReplicationEnabled) {
+					// replicate the job on at least one more cluster simultaneously
+					if (resourceManagersLoad.size() > 1) {
+						String secondLeastLoadedRM = getSecondLeastLoadedRM(leastLoadedRM);
+						// check the load to be less than 100%
+						if (resourceManagersLoad.get(secondLeastLoadedRM) < 100) {
+							sendReplicatedJob(secondLeastLoadedRM, job);
+						}
 					}
 				}
 
@@ -259,7 +407,6 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 		
 	}
-
 
 
 

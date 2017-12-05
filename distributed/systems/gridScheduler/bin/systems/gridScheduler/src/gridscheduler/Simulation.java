@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Simulation implements Runnable,KeyListener {
 	// Number of clusters in the simulation
-	private final static int nrClusters = 4;
+	private final static int nrClusters = 5;
 
 	// Number of nodes per cluster in the simulation
 	private final static int nrNodes = 12;
@@ -36,9 +36,12 @@ public class Simulation implements Runnable,KeyListener {
 
 	GridSchedulerPanel gridSchedulerPanel;
 
-	private static long jobCreationRatio = 200L;
-	private static long jobDuration = 8000L;
+    private Supervisor supervisor = null;
 
+	private static long jobCreationRatio = 200L;
+	private static long jobDuration = 1000L;//8000L
+
+    private boolean gsNodeFaultToggle = false;
 
 	private final static Logger logger = Logger.getLogger(Simulation.class.getName());
 	private static DecimalFormat df2 = new DecimalFormat(".##");
@@ -53,11 +56,11 @@ public class Simulation implements Runnable,KeyListener {
 
 		// TODO if something goes wrong recheck this logic
 		//GridSchedulerNode scheduler;
-		Supervisor supervisor = null;
+
 
 		// Setup the model. Create a grid scheduler and a set of clusters.
 		//scheduler = new GridSchedulerNode("scheduler1");
-		supervisor = new Supervisor("Supervisor",2); // TODO change this in order to have variable number of grid scheduler nodes
+		supervisor = new Supervisor("Supervisor",1,false); // TODO change this in order to have variable number of grid scheduler nodes
 
 		// Create a new gridscheduler panel so we can monitor our components
 		//gridSchedulerPanel = new GridSchedulerPanel(scheduler);
@@ -101,14 +104,18 @@ public class Simulation implements Runnable,KeyListener {
 
 		long jobId = 0;
 		gridSchedulerPanel.addKeyListener(this);
+
+        int highLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
+        int lowLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
 		// Do not stop the simulation as long as the gridscheduler panel remains open
 		while (gridSchedulerPanel.isVisible()) {
 
 
 			// Uncomment one at a time in order to simulate different behaviours
-
-			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
-			unEvenLoad(jobId++,5); //TODO make the ratio parameterized (extreme high load)
+            //idealLoad(jobId++);
+            //stressTest(jobId++, 5);
+			evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
+			//unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
 			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
@@ -122,15 +129,32 @@ public class Simulation implements Runnable,KeyListener {
 
 	}
 
+	public void idealLoad(long jobId){
+        // Add a new job to the system that take up random time
+
+        for(Cluster cluster:clusters) {
+            Job job = new Job(jobDuration, jobId++);
+            cluster.getResourceManager().addJob(job);
+        }
+    }
+
+    public void stressTest(long jobId, int ratio){
+        for (int i = 0; i < ratio; i++){
+            Job job = new Job(jobDuration, jobId++);
+            clusters[0].getResourceManager().addJob(job);
+        }
+        Job job = new Job(jobDuration, jobId);
+        clusters[clusters.length - 1].getResourceManager().addJob(job);
+    }
+
 	public void evenLoad(long jobId){
 		// Add a new job to the system that take up random time
 		Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId);
 		clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
 	}
 
-	public void unEvenLoad(long jobId, int ratio){
-		int highLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
-		int lowLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
+	public void unEvenLoad(long jobId, int highLoadTargetCluster, int lowLoadTargetCluster, int ratio){
+
 		for (int i = 0; i < ratio; i++) {
 			// Add a new job to the system that take up random time
 			Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId++);
@@ -176,17 +200,32 @@ public class Simulation implements Runnable,KeyListener {
 		// on LEFT key pressed decrease the job duration
 		if (e.getKeyCode() == KeyEvent.VK_LEFT ) {
 
-			//precondition: the job duration can't be less than 0,5 sec
-			if(jobDuration > 500) {
-				jobDuration -= 500;
+			//precondition: the job duration can't be less than 0,1 sec
+			if(jobDuration > 100) {
+				jobDuration -= 100;
 			}
 			logger.warn("Job duration DECREASED to " + df2.format((double) jobDuration/1000) + " sec.");
 		}
 		// on RIGHT key pressed increase the job duration
 		if (e.getKeyCode() == KeyEvent.VK_RIGHT ) {
-			jobDuration += 500;
+			jobDuration += 100;
 			logger.warn("Job duration INCREASED to " + df2.format((double) jobDuration/1000)  + " sec.");
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_G) {
+
+		    if(!gsNodeFaultToggle) {
+
+		        supervisor.injectGSnodeFault(!gsNodeFaultToggle);
+                gsNodeFaultToggle = true;
+                logger.fatal("A GS node was forced to go DOWN");
+            }else{
+                supervisor.injectGSnodeFault(gsNodeFaultToggle);
+		        gsNodeFaultToggle = false;
+                logger.fatal("A GS node was forced to go UP");
+            }
+
+        }
 	}
 
 	/**

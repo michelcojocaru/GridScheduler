@@ -238,7 +238,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * pre: parameter 'message' should not be null 
 	 * @param message a message
 	 */
-	public void onMessageReceived(Message message) {
+	public synchronized void onMessageReceived(Message message) {
 		// preconditions
 		assert(message instanceof ControlMessage) : "parameter 'message' should be of type ControlMessage";
 		assert(message != null) : "parameter 'message' cannot be null";
@@ -246,8 +246,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		ControlMessage controlMessage = (ControlMessage)message;
 
 		// resource manager wants to offload a job to us 
-		if (controlMessage.getType() == ControlMessageType.AddJob)
-		{
+		if (controlMessage.getType() == ControlMessageType.AddJob) {
 			//mark this cluster as visited
 			controlMessage.getJob().addClusterToVisited(this.cluster.getName());
 			//include this job in the waiting queue of this cluster
@@ -256,18 +255,32 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		}
 
 		// Grid scheduler asks for the load of this resource manager
-		if (controlMessage.getType() == ControlMessageType.RequestLoad)
-		{
+		if (controlMessage.getType() == ControlMessageType.RequestLoad) {
 			logger.info("RM: " + this.cluster.getName() + " received a request load from GS: " + controlMessage.getSource());
 
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyLoad);
 
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
-			replyMessage.setLoad(jobQueue.size()); //cluster.countFreeNodes()) // TODO change this to use moving average
+			replyMessage.setLoad(jobQueue.size() + cluster.countRunningNodes()); //cluster.countFreeNodes()) // TODO change this to use moving average
 
 			syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 
+		}
+
+		// Grid scheduler asks for a job of this resource manager
+		if (controlMessage.getType() == ControlMessageType.RequestJob){
+			logger.info("RM: " + this.cluster.getName() + " received a job request from GS: " + controlMessage.getSource());
+			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyJob);
+			replyMessage.setSource(this.cluster.getName());
+			replyMessage.setDestination(controlMessage.getSource());
+
+			Job job = jobQueue.poll();
+			job.addClusterToVisited(this.cluster.getName());
+			// retrieve and remove the head of the jobQueue in order to be sent to GS node
+			replyMessage.setJob(job);
+
+			syncSocket.sendMessage(replyMessage,"localsocket://" + controlMessage.getSource());
 		}
 
 		// Grid Scheduler asks this RM to remove a pending job from its queue

@@ -87,11 +87,6 @@ public class SynchronizedSocket {
 		// RM to GS / GS to RM
 		if(cMessage.getType() == ControlMessageType.AddJob){
 
-/*
-			if(gridSchedulerNode != null || !resourceManagers.isEmpty()){
-				send(cMessage,address);
-			}
-*/
 			if(cMessage.getDestination().equals(gridSchedulerNode.getAddress())){
 				gridSchedulerNode.onMessageReceived(cMessage);
 			}else{
@@ -106,12 +101,8 @@ public class SynchronizedSocket {
 
 		if(cMessage.getType() == ControlMessageType.RequestLoad){
 
-			System.out.println("GS: " + cMessage.getSource() + " to RM " + cMessage.getDestination()+ "- RequestLoad: ");
-/*
-			if(!resourceManagers.isEmpty()){
-				send(cMessage,address);
-			}
-*/
+			//System.out.println("GS: " + cMessage.getSource() + " to RM " + cMessage.getDestination()+ "- RequestLoad: ");
+
 			for(ResourceManager resourceManager:resourceManagers){
 				if(resourceManager.getName().equals(cMessage.getDestination())){
 					resourceManager.onMessageReceived(cMessage);
@@ -122,7 +113,7 @@ public class SynchronizedSocket {
 
 		if(cMessage.getType() == ControlMessageType.ReplyLoad){
 
-			System.out.println("RM " + cMessage.getSource() + "to GS " + cMessage.getDestination() + "- ReplyLoad");
+			//System.out.println("RM " + cMessage.getSource() + "to GS " + cMessage.getDestination() + "- ReplyLoad");
 			if(gridSchedulerNode != null){
 				gridSchedulerNode.onMessageReceived(cMessage);
 			}
@@ -130,7 +121,7 @@ public class SynchronizedSocket {
 
 		if(cMessage.getType() == ControlMessageType.ResourceManagerJoin){
 
-			System.out.println("RM " + cMessage.getSource() + "connected to GS " + cMessage.getDestination() + "- ResourceManagerJoin");
+			//System.out.println("RM " + cMessage.getSource() + "connected to GS " + cMessage.getDestination() + "- ResourceManagerJoin");
 			if(cMessage.getDestination().equals(gridSchedulerNode.getAddress())){
 				gridSchedulerNode.onMessageReceived(cMessage);
 			}
@@ -138,8 +129,8 @@ public class SynchronizedSocket {
 		}
 
 		if(cMessage.getType() == ControlMessageType.NotifyJobCompletion){
-			System.out.println("Notify Job Completion from " + cMessage.getSource() + " to " + cMessage.getDestination());
-			//broadcastToAllRMs(cMessage);
+			//System.out.println("Notify Job Completion from " + cMessage.getSource() + " to " + cMessage.getDestination());
+			broadcastToAllRMs(cMessage);
 		}
 
 	}

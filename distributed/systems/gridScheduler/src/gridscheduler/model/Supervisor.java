@@ -28,7 +28,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
      * It register itself to the global socket & populate a hashmap used for retaining
      * the number of jobs waiting in each node initially set to 0.
      */
-    public Supervisor(String address, int noOfGsNodes){
+    public Supervisor(String address, int noOfGsNodes, boolean jobReplicationEnabled){
         // preconditions
         assert(noOfGsNodes > 0): "Number of grid scheduler nodes must be positive!";
         assert(address != null): "Supervisor must have a name!";
@@ -36,9 +36,11 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         this.address = address;
 
         // initialize the grid scheduler nodes that this supervisor is coordinating
-        gridSchedulerNodes = new ArrayList<>(noOfGsNodes);
+        gridSchedulerNodes = new ArrayList<>(2 * noOfGsNodes);
         for(int i = 0; i < noOfGsNodes; i++){
-            gridSchedulerNodes.add(new GridSchedulerNode("gridSchedulerNode" + i));
+            GridSchedulerNode replica = new GridSchedulerNode("gridSchedulerNode" + (i + 1), jobReplicationEnabled);
+            gridSchedulerNodes.add(new GridSchedulerNode("gridSchedulerNode" + i, replica, jobReplicationEnabled));
+            gridSchedulerNodes.add(replica);
         }
 
         // register supervisor to the global socket
@@ -136,6 +138,11 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
             noOfWaitingJobs += gsNode.getWaitingJobs();
         }
         return String.valueOf(noOfWaitingJobs);
+    }
+
+    public void injectGSnodeFault(boolean status){
+        //gridSchedulerNodes.get(0).setIsReplicaStatus(status);
+        gridSchedulerNodes.get(0).toggleStatus();
     }
 
     /**
