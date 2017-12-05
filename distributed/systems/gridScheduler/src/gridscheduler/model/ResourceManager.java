@@ -94,16 +94,16 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// if the jobqueue is full, offload the job to the grid scheduler
 		if (jobQueue.size() >= jobQueueSize) {
-			// TODO rewrite this in order to use syncSocket instead of global syncSocket once the link is up
+
 			ControlMessage controlMessage = new ControlMessage(ControlMessageType.AddJob);
 			//include the sender url into the message
 			controlMessage.setSource(this.cluster.getName());
 			controlMessage.setDestination(syncSocket.getGridSchdulerNodeAddress());
-			//controlMessage.setUrl(socketURL);
 			controlMessage.setJob(job);
-			job.addClusterToVisited(this.cluster.getName());
-			syncSocket.sendMessage(controlMessage, "localsocket://" + syncSocket.getGridSchdulerNodeAddress());
 
+			job.addClusterToVisited(this.cluster.getName());
+
+			syncSocket.sendMessage(controlMessage, "localsocket://" + syncSocket.getGridSchdulerNodeAddress());
 
 			// otherwise store it in the local queue
 		} else {

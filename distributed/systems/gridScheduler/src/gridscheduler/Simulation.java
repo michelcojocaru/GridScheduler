@@ -108,7 +108,7 @@ public class Simulation implements Runnable,KeyListener {
 			// Uncomment one at a time in order to simulate different behaviours
 
 			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
-			unEvenLoad(jobId,5); //TODO make the ratio parameterized (extreme high load)
+			unEvenLoad(jobId++,5); //TODO make the ratio parameterized (extreme high load)
 			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
@@ -127,7 +127,7 @@ public class Simulation implements Runnable,KeyListener {
 		Job job = new Job(jobDuration + (int) (Math.random() * 5000), jobId);
 		clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
 	}
-
+    // TODO repair this to be uneven for the same 2 clusters
 	public void unEvenLoad(long jobId, int ratio){
 		int highLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
 		int lowLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);

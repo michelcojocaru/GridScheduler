@@ -108,7 +108,7 @@ public class Simulation implements Runnable,KeyListener {
 			// Uncomment one at a time in order to simulate different behaviours
 
 			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
-			unEvenLoad(jobId,5); //TODO make the ratio parameterized (extreme high load)
+			unEvenLoad(jobId++,5); //TODO make the ratio parameterized (extreme high load)
 			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {

@@ -156,16 +156,59 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		int minLoad = Integer.MAX_VALUE;
 		
 		// loop over all resource managers, and pick the one with the lowest load
-		for (String key : resourceManagersLoad.keySet())
-		{
-			if (resourceManagersLoad.get(key) <= minLoad)
-			{
-				ret = key;
-				minLoad = resourceManagersLoad.get(key);
-			}
+		for (String key : resourceManagersLoad.keySet()) {
+			// check the load to be less than 100%
+			//if(resourceManagersLoad.get(key) < 100) {
+				if (resourceManagersLoad.get(key) <= minLoad) {
+					ret = key;
+					minLoad = resourceManagersLoad.get(key);
+				}
+			//}
 		}
 		
 		return ret;		
+	}
+
+	// finds the least loaded resource manager and returns its address
+	private String getSecondLeastLoadedRM(String leastLoadedRM) {
+
+		String ret = null;
+		int minLoad = Integer.MAX_VALUE;
+
+		// loop over all resource managers, and pick the one
+		// with the lowest load that hasn't been already chosen
+		for(String key : resourceManagersLoad.keySet()){
+			// check the load to be less than 100%
+			//if(resourceManagersLoad.get(key) < 100) {
+				if (resourceManagersLoad.get(key) <= minLoad && !key.equals(leastLoadedRM)) {
+					ret = key;
+					minLoad = resourceManagersLoad.get(key);
+				}
+			//}
+		}
+
+		return ret;
+	}
+
+	private void sendReplicatedJob(String target, Job job){
+
+		if (target != null) {
+
+			ControlMessage cMessage = new ControlMessage(ControlMessageType.AddJob);
+			cMessage.setJob(job);
+			cMessage.setSource(this.getAddress());
+			cMessage.setDestination(target);
+
+			syncSocket.sendMessage(cMessage, "localsocket://" + target);
+			logger.info("[GridSchedulerNode] GS " + this.getAddress() + " sends job " + cMessage.getJob().getId() + " to RM: " + target);
+
+			jobQueue.remove(job);
+
+			// increase the estimated load of that RM by 1 (because we just added a job)
+			int load = resourceManagersLoad.get(target);
+			resourceManagersLoad.put(target, load + 1);
+
+		}
 	}
 
 	/**
@@ -175,45 +218,37 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	public void run() {
 		while (running) {
 			// send a message to each resource manager, requesting its load
-			for (String rmAdress : resourceManagersLoad.keySet())
-			{
+			for (String rmAdress : resourceManagersLoad.keySet()) {
+
 				ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestLoad);
 
-				//cMessage.setUrl(this.getAddress());
 				cMessage.setSource(this.getAddress());
 				cMessage.setDestination(rmAdress);
 
 				syncSocket.sendMessage(cMessage, "localsocket://" + rmAdress);
 			}
-
+			//TODO verify that the RM can accept any more jobs
 			// schedule waiting messages to the different clusters
-			for (Job job : jobQueue)
-			{
-				// replicate the job on at least 2 clusters simultaneously
-				for(int i = 0; i < 2; i++) {
+			for (Job job : jobQueue) {
 
-					String leastLoadedRM = getLeastLoadedRM();
+				String leastLoadedRM = getLeastLoadedRM();
+				// check the load to be less than 100%
+				if(resourceManagersLoad.get(leastLoadedRM) < 100) {
+					sendReplicatedJob(leastLoadedRM, job);
+				}
 
-					if (leastLoadedRM != null) {
-
-						ControlMessage cMessage = new ControlMessage(ControlMessageType.AddJob);
-						cMessage.setJob(job);
-						cMessage.setSource(this.getAddress());
-						cMessage.setDestination(leastLoadedRM);
-
-						syncSocket.sendMessage(cMessage, "localsocket://" + leastLoadedRM);
-						logger.info("[GridSchedulerNode] GS " + this.getAddress() + " sends job " + cMessage.getJob().getId() + " to RM: " + leastLoadedRM);
-
-						jobQueue.remove(job);
-
-						// increase the estimated load of that RM by 1 (because we just added a job)
-						int load = resourceManagersLoad.get(leastLoadedRM);
-						resourceManagersLoad.put(leastLoadedRM, load + 1);
-
+				// replicate the job on at least one more cluster simultaneously
+				if(resourceManagersLoad.size() > 1) {
+					String secondLeastLoadedRM = getSecondLeastLoadedRM(leastLoadedRM);
+					// check the load to be less than 100%
+					if(resourceManagersLoad.get(secondLeastLoadedRM) < 100) {
+						sendReplicatedJob(secondLeastLoadedRM, job);
 					}
 				}
-				
+
 			}
+
+
 
 			// sleep
 			try
@@ -226,7 +261,11 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 		
 	}
-	
+
+
+
+
+
 	/**
 	 * Stop the polling thread. This has to be called explicitly to make sure the program 
 	 * terminates cleanly.
