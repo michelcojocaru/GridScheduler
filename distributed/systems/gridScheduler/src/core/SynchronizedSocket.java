@@ -55,7 +55,7 @@ public class SynchronizedSocket {
 	public void register(String url){
 		this.socketName = url;
 	}
-*/
+
 	private void send(ControlMessage cMessage,String address) {
 
 		if (cMessage.getDestination().equals(gridSchedulerNode.getAddress())) {
@@ -71,6 +71,7 @@ public class SynchronizedSocket {
 			}
 		}
 	}
+*/
 	// TODO rewrite this for the current architecture with multiple gs nodes
 	// broadcast the message to all RMs except the one that issued the request
 	private void broadcastToAllRMs(ControlMessage cMessage){
@@ -95,6 +96,16 @@ public class SynchronizedSocket {
 						resourceManager.onMessageReceived(cMessage);
 						break;
 					}
+				}
+			}
+		}
+
+		if(cMessage.getType() == ControlMessageType.RequestJob) {
+
+			for(ResourceManager resourceManager:resourceManagers){
+				if(resourceManager.getName().equals(cMessage.getDestination())){
+					resourceManager.onMessageReceived(cMessage);
+					break;
 				}
 			}
 		}

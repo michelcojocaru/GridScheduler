@@ -17,27 +17,30 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     // list of all the managed grid scheduler nodes
     private ArrayList<GridSchedulerNode> gridSchedulerNodes = null;
 
+    private int noOfGsGroups = 0;
+
     // name of this supervisor
     private String address = null;
 
     private static int minNoOfConnections = Integer.MAX_VALUE;
 
     /**
-     * Constructor of supervisor named @param address, which creates @param noOfGsNodes
+     * Constructor of supervisor named @param address, which creates @param noOfGsGroups
      * grid scheduler nodes.
      * It register itself to the global socket & populate a hashmap used for retaining
      * the number of jobs waiting in each node initially set to 0.
      */
-    public Supervisor(String address, int noOfGsNodes, boolean jobReplicationEnabled){
+    public Supervisor(String address, int noOfGsGroups, boolean jobReplicationEnabled){
         // preconditions
-        assert(noOfGsNodes > 0): "Number of grid scheduler nodes must be positive!";
+        assert(noOfGsGroups > 0): "Number of grid scheduler nodes must be positive!";
         assert(address != null): "Supervisor must have a name!";
 
         this.address = address;
+        this.noOfGsGroups = noOfGsGroups;
 
         // initialize the grid scheduler nodes that this supervisor is coordinating
-        gridSchedulerNodes = new ArrayList<>(2 * noOfGsNodes);
-        for(int i = 0; i < noOfGsNodes; i++){
+        gridSchedulerNodes = new ArrayList<>(2 * noOfGsGroups);
+        for(int i = 0; i < noOfGsGroups; i++){
             GridSchedulerNode replica = new GridSchedulerNode("gridSchedulerNode" + (i + 1), jobReplicationEnabled);
             gridSchedulerNodes.add(new GridSchedulerNode("gridSchedulerNode" + i, replica, jobReplicationEnabled));
             gridSchedulerNodes.add(replica);
@@ -65,9 +68,76 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
 
     }
 
+    private GridSchedulerNode getPrimaryGsNode(int index){
+
+        if(!gridSchedulerNodes.get(index * 2).getIsReplicaStatus()){
+            return gridSchedulerNodes.get(index * 2);
+        }
+        return gridSchedulerNodes.get( (index * 2) + 1);
+    }
+
     @Override
     public void run() {
+        /*
+        while(true){
+            synchronized (this) {
+                for (int i = 0; i < noOfGsGroups; i++) {
+                    GridSchedulerNode primaryGsNode1 = getPrimaryGsNode(i);
+                    GridSchedulerNode primaryGsNode2 = getPrimaryGsNode((i + 1) % noOfGsGroups);
 
+                    evenLoadsOfGsNodes(primaryGsNode1, primaryGsNode2);
+                }
+            }
+        }
+        */
+    }
+
+    private void evenLoadsOfGsNodes(GridSchedulerNode primaryGsNode1, GridSchedulerNode primaryGsNode2) {
+        int numberOfNonReplicatedJobsOnGSnode1 = primaryGsNode1.getNoOfNonReplicatedJobs();
+        int numberOfNonReplicatedJobsOnGSnode2 = primaryGsNode2.getNoOfNonReplicatedJobs();
+
+        int diff = Math.abs(numberOfNonReplicatedJobsOnGSnode1 - numberOfNonReplicatedJobsOnGSnode2);
+
+        if (numberOfNonReplicatedJobsOnGSnode1 > numberOfNonReplicatedJobsOnGSnode2) {
+            //TODO move diff no of jobs to primary2
+            migrateNonReplicatedJobs(primaryGsNode1, primaryGsNode2, diff);
+        }else if (numberOfNonReplicatedJobsOnGSnode1 < numberOfNonReplicatedJobsOnGSnode2) {
+            //TODO move diff no of jobs to primary1
+            migrateNonReplicatedJobs(primaryGsNode2, primaryGsNode1, diff);
+        }
+    }
+
+    private void migrateNonReplicatedJobs(GridSchedulerNode primaryGsNodeSource, GridSchedulerNode primaryGsNodeDestination, int diff) {
+        int remainingJobs = diff;
+        while (remainingJobs > 0){
+
+            primaryGsNodeSource.getHighestLoadedRMnumberOfNonReplicatedJobs();
+            // busy waiting for the result
+            while (primaryGsNodeSource.getNoOfNonReplicatedJobsOnOneRM() == -1) {}
+
+            int availableNumberOfJobsToMove = primaryGsNodeSource.getNoOfNonReplicatedJobsOnOneRM();
+
+            if (availableNumberOfJobsToMove > remainingJobs){
+                migrateJobs(primaryGsNodeSource, primaryGsNodeDestination, remainingJobs);
+            } else {
+                migrateJobs(primaryGsNodeSource, primaryGsNodeDestination, availableNumberOfJobsToMove);
+            }
+
+            remainingJobs -= availableNumberOfJobsToMove;
+        }
+
+    }
+
+    private void migrateJobs(GridSchedulerNode primaryGsNodeSource, GridSchedulerNode primaryGsNodeDestination, int remainingJobs) {
+
+        for (int i = 0; i < remainingJobs; i++) {
+
+            ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestJob);
+            cMessage.setSource(primaryGsNodeDestination.getAddress());
+            cMessage.setDestination(primaryGsNodeSource.getHighestLoadedRMname());
+
+            primaryGsNodeSource.getSyncSocket().sendMessage(cMessage,"localsocket://");
+        }
     }
 
     /**
@@ -141,7 +211,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     }
 
     public void injectGSnodeFault(boolean status){
-        //gridSchedulerNodes.get(0).setIsReplicaStatus(status);
+        //TODO reimplement this to make random faults in gs nodes
         gridSchedulerNodes.get(0).toggleStatus();
     }
 

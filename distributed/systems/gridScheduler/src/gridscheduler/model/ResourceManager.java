@@ -143,6 +143,21 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	}
 
 	/**
+	 * Counts to find a waiting job in the jobqueue.
+	 * @return
+	 */
+	public int getNonReplicatedJobsCount() {
+		int count = 0;
+		// find a waiting job
+		for (Job job : jobQueue)
+			if (job.getStatus() == JobStatus.Waiting && !job.isReplicated())
+				count++;
+
+		// no waiting jobs found, return 0
+		return count;
+	}
+
+	/**
 	 * Tries to schedule jobs in the jobqueue to free nodes. 
 	 */
 	public void scheduleJobs() {
@@ -254,6 +269,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			scheduleJobs();
 		}
 
+
 		// Grid scheduler asks for the load of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestLoad) {
 			logger.info("RM: " + this.cluster.getName() + " received a request load from GS: " + controlMessage.getSource());
@@ -270,17 +286,24 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// Grid scheduler asks for a job of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestJob){
+
 			logger.info("RM: " + this.cluster.getName() + " received a job request from GS: " + controlMessage.getSource());
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyJob);
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource());
 
-			Job job = jobQueue.poll();
-			job.addClusterToVisited(this.cluster.getName());
-			// retrieve and remove the head of the jobQueue in order to be sent to GS node
-			replyMessage.setJob(job);
+			for (Job job:jobQueue){
+				if(!job.isReplicated() && job.getStatus() == JobStatus.Waiting){
 
-			syncSocket.sendMessage(replyMessage,"localsocket://" + controlMessage.getSource());
+
+				job.addClusterToVisited(this.cluster.getName());
+				// retrieve and remove the head of the jobQueue in order to be sent to GS node
+				replyMessage.setJob(job);
+				jobQueue.remove(job);
+
+				syncSocket.sendMessage(replyMessage,"localsocket://" + controlMessage.getSource());
+				}
+			}
 		}
 
 		// Grid Scheduler asks this RM to remove a pending job from its queue
@@ -292,6 +315,18 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 					break;
 				}
 			}
+		}
+		// Grid Scheduler asks this RM to for the number of non replicated jobs from its queue
+		if (controlMessage.getType() == ControlMessageType.RequestNoOfNonReplicatedJobs){
+
+			logger.info("RM: " + this.cluster.getName() + " received a number of non-replicated jobs request from GS: " + controlMessage.getSource());
+			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyNoOfNonReplicatedJobs);
+			replyMessage.setSource(this.cluster.getName());
+			replyMessage.setDestination(controlMessage.getSource());
+			replyMessage.setLoad(getNonReplicatedJobsCount());
+
+			syncSocket.sendMessage(replyMessage,"localsocket://" + controlMessage.getSource());
+
 		}
 
 	}

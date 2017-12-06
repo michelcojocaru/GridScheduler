@@ -13,10 +13,17 @@ public enum ControlMessageType {
 	ResourceManagerJoin,
 	ReplyLoad,
 	ReplyJob,
+	ReplyNoOfNonReplicatedJobs,
+	ReplyNonReplicatedJob,
+	ReplyNoOfNonReplicatedJobsOnOneRM,
+
 
 	// from GS to RM
 	RequestLoad,
 	RequestJob,
+	RequestNoOfNonReplicatedJobs,
+	RequestNonReplicatedJob,
+	RequestNoOfNonReplicatedJobsOnOneRM,
 
 	// both ways
 	AddJob,

@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Simulation implements Runnable,KeyListener {
 	// Number of clusters in the simulation
-	private final static int nrClusters = 5;
+	private final static int nrClusters = 4;
 
 	// Number of nodes per cluster in the simulation
 	private final static int nrNodes = 12;
@@ -39,7 +39,7 @@ public class Simulation implements Runnable,KeyListener {
     private Supervisor supervisor = null;
 
 	private static long jobCreationRatio = 200L;
-	private static long jobDuration = 1000L;//8000L
+	private static long jobDuration = 8000L;//8000L
 
     private boolean gsNodeFaultToggle = false;
 
@@ -114,8 +114,8 @@ public class Simulation implements Runnable,KeyListener {
 			// Uncomment one at a time in order to simulate different behaviours
             //idealLoad(jobId++);
             //stressTest(jobId++, 5);
-			evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
-			//unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
+			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
+			unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
 			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {

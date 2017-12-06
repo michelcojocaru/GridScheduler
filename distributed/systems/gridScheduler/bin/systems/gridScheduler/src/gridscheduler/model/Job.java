@@ -17,6 +17,7 @@ public class Job {
 	private JobStatus status;
 	private long id;
 	private ArrayList<String> visitedClusters = null;
+	private boolean isReplicated;
 
 	private final static Logger logger = Logger.getLogger(Job.class.getName());
 
@@ -38,6 +39,7 @@ public class Job {
 		this.duration = duration;
 		this.status = JobStatus.Waiting;
 		this.id = id;
+		this.isReplicated = false;
 		this.visitedClusters = new ArrayList<>();
 	}
 
@@ -51,6 +53,18 @@ public class Job {
 			visitedClusters.remove(cluster);
 			logger.info("Cluster: " + cluster + " was removed from Jobs " + this.getId() + " visited queue.");
 		}
+	}
+
+	/**
+	 * Returns true if this job was replicated else false
+	 * @return boolean
+	 */
+	public boolean isReplicated() {
+		return this.isReplicated;
+	}
+
+	public void setIsReplicated(boolean isReplicated) {
+		this.isReplicated = isReplicated;
 	}
 
 	/**

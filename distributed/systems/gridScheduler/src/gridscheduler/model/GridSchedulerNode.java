@@ -36,7 +36,17 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 	// the average load of all clusters connected to this GS node
 	private int averageLoad = 0;
 
+	private int maxLoad = 0;
+	private String highestLoadedRMname;
+
+	// TODO
 	private boolean jobReplicationEnabled = false;
+
+	// TODO
+	private int noOfNonReplicatedJobs = 0;
+	private int noOfNonReplicatedJobsOnOneRM = -1;
+
+	private int noOfAlreadyReceivedMessages = 0;
 
 
 	// polling frequency, 1hz
@@ -164,8 +174,6 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			this.registerToSyncSocket(replica);
 			logger.warn("GS node " + this.getAddress() + " became ACTIVE.");
 		}
-
-
 	}
 
 	public void registerToSyncSocket(GridSchedulerNode gsNode){
@@ -250,8 +258,47 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			jobQueue.remove(controlMessage.getJob());
 
 		}
-			
+
+		if (controlMessage.getType() == ControlMessageType.ReplyNoOfNonReplicatedJobs){
+
+			noOfNonReplicatedJobs += controlMessage.getLoad();
+
+			if(controlMessage.getLoad() > maxLoad){
+				highestLoadedRMname = controlMessage.getSource();//TODO check this
+			}
+
+			if(noOfAlreadyReceivedMessages >= resourceManagersLoad.size()){
+				noOfNonReplicatedJobs = 0;
+				noOfAlreadyReceivedMessages = 0;
+			}
+		}
+
+		if (controlMessage.getType() == ControlMessageType.ReplyNoOfNonReplicatedJobsOnOneRM){
+			noOfNonReplicatedJobsOnOneRM = controlMessage.getLoad();
+		}
+
 		
+	}
+
+	public String getHighestLoadedRMname(){
+		return this.highestLoadedRMname;
+	}
+
+	public int getNoOfNonReplicatedJobsOnOneRM(){
+		return this.noOfNonReplicatedJobsOnOneRM;
+	}
+
+	public void getHighestLoadedRMnumberOfNonReplicatedJobs(){
+		ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestNoOfNonReplicatedJobsOnOneRM);
+		cMessage.setSource(this.address);
+		cMessage.setDestination(highestLoadedRMname);
+		syncSocket.sendMessage(cMessage,"localhost://");
+	}
+
+
+
+	public int getNoOfNonReplicatedJobs() {
+		return this.noOfNonReplicatedJobs;
 	}
 
 	// finds the least loaded resource manager and returns its address
@@ -287,6 +334,8 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 
 		return ret;
 	}
+
+
 
 	private void sendReplicatedJob(String target, Job job){
 
@@ -363,6 +412,20 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 				syncSocket.sendMessage(cMessage, "localsocket://" + rmAdress);
 			}
 
+			// send a message to each resource manager, requesting
+			// its number of waiting jobs that are not replicated
+			for (String rmAdress : resourceManagersLoad.keySet()) {
+
+				ControlMessage cMessage = new ControlMessage(ControlMessageType.RequestNoOfNonReplicatedJobs);
+
+				cMessage.setSource(this.getAddress());
+				cMessage.setDestination(rmAdress);
+
+				syncSocket.sendMessage(cMessage, "localsocket://" + rmAdress);
+			}
+
+
+
 			// TODO take the job from the RM that has a load higher than the average of all
 			// RMs and dispach it to the RM that has a load lower than the average of all connected RMs
 			averageLoad = calculateAverageLoad();
@@ -379,6 +442,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 				String leastLoadedRM = getLeastLoadedRM();
 				// check the load to be less than 100%
 				if(resourceManagersLoad.get(leastLoadedRM) < 100) {
+					job.setIsReplicated(true);
 					sendReplicatedJob(leastLoadedRM, job);
 				}
 				if(jobReplicationEnabled) {
@@ -387,6 +451,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 						String secondLeastLoadedRM = getSecondLeastLoadedRM(leastLoadedRM);
 						// check the load to be less than 100%
 						if (resourceManagersLoad.get(secondLeastLoadedRM) < 100) {
+							job.setIsReplicated(true);
 							sendReplicatedJob(secondLeastLoadedRM, job);
 						}
 					}
