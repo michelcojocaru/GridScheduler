@@ -245,9 +245,10 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 
 		// one of the clusters notified the GS that it completed a job
-		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
-			syncSocket.sendMessage(controlMessage,"localhost://placeholder"); //TODO get rid of the address field
+		if (controlMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
+			//syncSocket.sendMessage(controlMessage,"localhost://placeholder"); //TODO this will no longer be necessary since the RMs are already notified
 			jobQueue.remove(controlMessage.getJob());
+			//TODO broadcast to all other GS nodes
 
 		}
 			
@@ -309,7 +310,17 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 	}
 
-	public int calculateAverageLoad(){
+	public int getNumberOfNonReplicatedJobs(){
+		int nonReplicatedLoad = 0;
+		if(resourceManagersLoad != null) {
+			for (String rmAddress : resourceManagersLoad.keySet()) {
+				nonReplicatedLoad += resourceManagersLoad.get(rmAddress);
+			}
+		}
+		return nonReplicatedLoad;
+	}
+
+	private int calculateAverageLoad(){
 		int average = 0;
 
 		for(String rmAddress : resourceManagersLoad.keySet()){
@@ -344,6 +355,21 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			}
 		}
 
+	}
+
+	public Job getJobFromGsNodeJobQueue(){
+		for (Job job:jobQueue){
+			if (job.getStatus() == JobStatus.Waiting && !job.getIsReplicated()){
+				jobQueue.remove(job);
+				job.addClusterToVisited(this.getAddress());
+				return job;
+			}
+		}
+		return null;
+	}
+
+	public void addJob(Job job){
+		this.jobQueue.add(job);
 	}
 
 	/**

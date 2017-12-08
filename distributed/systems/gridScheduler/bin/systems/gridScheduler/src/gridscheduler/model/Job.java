@@ -17,6 +17,7 @@ public class Job {
 	private JobStatus status;
 	private long id;
 	private ArrayList<String> visitedClusters = null;
+	private boolean isReplicated;
 
 	private final static Logger logger = Logger.getLogger(Job.class.getName());
 
@@ -39,6 +40,7 @@ public class Job {
 		this.status = JobStatus.Waiting;
 		this.id = id;
 		this.visitedClusters = new ArrayList<>();
+		this.isReplicated = false;
 	}
 
 	public void addClusterToVisited(String cluster){
@@ -92,4 +94,11 @@ public class Job {
 		return "Job {ID = " + id + "}";
 	}
 
+	public boolean getIsReplicated() {
+		return this.isReplicated;
+	}
+
+	public void setIsReplicated(boolean isReplicated){
+		this.isReplicated = isReplicated;
+	}
 }

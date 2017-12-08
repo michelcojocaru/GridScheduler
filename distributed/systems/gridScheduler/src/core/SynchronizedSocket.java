@@ -73,13 +73,17 @@ public class SynchronizedSocket {
 	}
 	// TODO rewrite this for the current architecture with multiple gs nodes
 	// broadcast the message to all RMs except the one that issued the request
-	private void broadcastToAllRMs(ControlMessage cMessage){
+	private void broadcastToAll(ControlMessage cMessage){
+
+		gridSchedulerNode.onMessageReceived(cMessage);
+
 		for (ResourceManager resourceManager : resourceManagers) {
 			if (!cMessage.getSource().equals(resourceManager.getName())) {
 				logger.info("GS: " + cMessage.getSource() + " is sending a job " + cMessage.getJob().getId() + " removal request to RM: " + resourceManager.getName());
 				resourceManager.onMessageReceived(cMessage);
 			}
 		}
+
 	}
 
 	//TODO check for defects
@@ -95,6 +99,28 @@ public class SynchronizedSocket {
 						resourceManager.onMessageReceived(cMessage);
 						break;
 					}
+				}
+			}
+		}
+
+		if(cMessage.getType() == ControlMessageType.ReplyJob){
+			if(cMessage.getDestination().equals(gridSchedulerNode.getAddress())){
+				gridSchedulerNode.onMessageReceived(cMessage);
+			}else{
+				for(ResourceManager resourceManager:resourceManagers){
+					if(resourceManager.getName().equals(cMessage.getDestination())){
+						resourceManager.onMessageReceived(cMessage);
+						break;
+					}
+				}
+			}
+		}
+
+		if(cMessage.getType() == ControlMessageType.RequestJob){
+			for(ResourceManager resourceManager:resourceManagers){
+				if(resourceManager.getName().equals(cMessage.getDestination())){
+					resourceManager.onMessageReceived(cMessage);
+					break;
 				}
 			}
 		}
@@ -128,9 +154,9 @@ public class SynchronizedSocket {
 			// send(cMessage,address);
 		}
 
-		if(cMessage.getType() == ControlMessageType.NotifyJobCompletion){
+		if(cMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
 			//System.out.println("Notify Job Completion from " + cMessage.getSource() + " to " + cMessage.getDestination());
-			broadcastToAllRMs(cMessage);
+			broadcastToAll(cMessage);
 		}
 
 	}

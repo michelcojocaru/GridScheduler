@@ -171,7 +171,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 
 		//ask the GS to notify all the other RMs to remove the job from their queues (if present)
-		ControlMessage nMessage = new ControlMessage(ControlMessageType.NotifyJobCompletion);
+		ControlMessage nMessage = new ControlMessage(ControlMessageType.RequestNotifyJobCompletion);
 		nMessage.setSource(this.cluster.getName());
 		nMessage.setDestination(getGridSchedulerAddress());
 		nMessage.setJob(job);
@@ -230,6 +230,25 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		this.syncSocket = syncSocket;
 	}
 
+	private Job extractNonReplicatedJob(){
+		for(Job job:jobQueue){
+			if(job.getStatus() == JobStatus.Waiting && !job.getIsReplicated()){
+				jobQueue.remove(job);
+				return job;
+			}
+		}
+		return null;
+	}
+
+	public int getNumberOfNonReplicatedJobsWaiting(){
+		int count = 0;
+		for(Job job: jobQueue){
+			if(job.getStatus() == JobStatus.Waiting && !job.getIsReplicated()){
+				count++;
+			}
+		}
+		return count;
+	}
 
 	/**
 	 * Message received handler
@@ -262,7 +281,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
-			replyMessage.setLoad(jobQueue.size() + cluster.countRunningNodes()); //cluster.countFreeNodes()) // TODO change this to use moving average
+			replyMessage.setLoad(getNumberOfNonReplicatedJobsWaiting()); // TODO change this to use moving average
 
 			syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 
@@ -270,21 +289,27 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// Grid scheduler asks for a job of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestJob){
+
 			logger.info("RM: " + this.cluster.getName() + " received a job request from GS: " + controlMessage.getSource());
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyJob);
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource());
 
-			Job job = jobQueue.poll();
-			job.addClusterToVisited(this.cluster.getName());
-			// retrieve and remove the head of the jobQueue in order to be sent to GS node
-			replyMessage.setJob(job);
 
-			syncSocket.sendMessage(replyMessage,"localsocket://" + controlMessage.getSource());
+			Job job = extractNonReplicatedJob();
+
+			if(job != null) {
+
+				job.addClusterToVisited(this.cluster.getName());
+				// retrieve and remove the head of the jobQueue in order to be sent to GS node
+				replyMessage.setJob(job);
+
+				syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
+			}
 		}
 
 		// Grid Scheduler asks this RM to remove a pending job from its queue
-		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
+		if (controlMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
 			for(Job job:jobQueue){
 				if(job.getId() == controlMessage.getJob().getId()){
 					jobQueue.remove(job);

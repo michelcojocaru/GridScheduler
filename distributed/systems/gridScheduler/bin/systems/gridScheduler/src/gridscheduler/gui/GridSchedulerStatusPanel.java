@@ -1,5 +1,6 @@
 package gridscheduler.gui;
 
+import gridscheduler.model.GridSchedulerNode;
 import gridscheduler.model.Supervisor;
 
 import java.awt.*;
@@ -28,7 +29,7 @@ public class GridSchedulerStatusPanel extends StatusPanel {
 
 	public GridSchedulerStatusPanel(Supervisor supervisor) {
 		this.supervisor = supervisor;
-		setPreferredSize(new Dimension(panelWidth,50));
+		setPreferredSize(new Dimension(panelWidth,75));
 	}
 	
     protected void paintComponent(Graphics g) {
@@ -48,10 +49,14 @@ public class GridSchedulerStatusPanel extends StatusPanel {
 	    g.drawString("Scheduler name ", x, y);
 	    g.drawString("" + supervisor.getAddress(), x + colWidth, y);
 	    y += fontHeight;
-	    
-	    g.drawString("Jobs waiting ", x, y);
-	    g.drawString("" + supervisor.getWaitingJobs(), x + colWidth, y);
-	    y += fontHeight;
+
+	    for(GridSchedulerNode gsNode:supervisor.getGridSchedulerNodes()) {
+	    	if(!gsNode.getIsReplicaStatus()) {
+				g.drawString("Waiting jobs GSnode " + gsNode.getAddress().substring(gsNode.getAddress().length() - 1)  + ":", x, y);
+				g.drawString("" + gsNode.getWaitingJobs(), x + colWidth, y);
+				y += fontHeight;
+			}
+		}
 
 
     }	

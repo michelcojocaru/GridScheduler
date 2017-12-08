@@ -20,7 +20,17 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     // name of this supervisor
     private String address = null;
 
+    // the arithmetic average of all grid scheduler nodes
+    private int averageLoad;
+
     private static int minNoOfConnections = Integer.MAX_VALUE;
+
+    // polling frequency, 1hz
+    private long pollSleep = 50;//1000
+
+    // polling thread
+    private Thread pollingThread;
+    private boolean running;
 
     /**
      * Constructor of supervisor named @param address, which creates @param noOfGsNodes
@@ -34,6 +44,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         assert(address != null): "Supervisor must have a name!";
 
         this.address = address;
+        this.averageLoad = 0;
 
         // initialize the grid scheduler nodes that this supervisor is coordinating
         gridSchedulerNodes = new ArrayList<>(2 * noOfGsNodes);
@@ -61,14 +72,115 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
             gridSchedulerNodeConnectedRMs.put(gsNode,0);
         }
 
-
+        // start the polling thread
+        running = true;
+        pollingThread = new Thread(this);
+        pollingThread.start();
 
     }
+
+    private int calculateAverageLoad(){
+        int average = 0;
+
+        for(String gsNodeAddress:gridSchedulersLoad.keySet()){
+            average += gridSchedulersLoad.get(gsNodeAddress);
+        }
+        average /= gridSchedulersLoad.size();
+        return average;
+    }
+
+    private void requestJobFromGSnodeWithHigherThanAverageLoad(int averageLoad) {
+        for(String gsNodeAddress:gridSchedulersLoad.keySet()){
+            if(gridSchedulersLoad.get(gsNodeAddress) > averageLoad){
+                sendJobRequest(gsNodeAddress);
+            }
+        }
+    }
+
+    private String getLeastLoadedGsNodeAddress(){
+
+        String address = null;
+        int minLoad = Integer.MAX_VALUE;
+
+        for(String gsNodeAddress:gridSchedulersLoad.keySet()){
+            if(gridSchedulersLoad.get(gsNodeAddress) < minLoad){
+                address = gsNodeAddress;
+                minLoad = gridSchedulersLoad.get(gsNodeAddress);
+            }
+        }
+
+        return address;
+    }
+
+    private GridSchedulerNode getLeastLoadedJobQueueGsNode(String address){
+
+        for(GridSchedulerNode gsNode:gridSchedulerNodes){
+            if(address.equals(gsNode.getAddress()) && !gsNode.getIsReplicaStatus()){
+                return gsNode;
+            }
+        }
+        return null;
+    }
+
+    private void sendJobToLeastLoadedGsNode(Job job) {
+        String targetAddress = getLeastLoadedGsNodeAddress();
+        //System.out.println("targetGSNodeAddress: " + targetAddress);
+        GridSchedulerNode targetGsNode = getLeastLoadedJobQueueGsNode(targetAddress);
+        if(targetGsNode != null) {
+            System.out.println("Adresa gs target: " + targetGsNode.getAddress());
+            targetGsNode.addJob(job);
+        }
+    }
+
+    private void sendJobRequest(String gsNodeAddress) {
+
+        if (gsNodeAddress != null) {
+            for (GridSchedulerNode gsNode:gridSchedulerNodes) {
+                if (gsNodeAddress.equals(gsNode.getAddress())) {
+                    Job job = gsNode.getJobFromGsNodeJobQueue();
+
+                    if(job != null){
+                        System.out.println("Job id: "+job.getId());
+                        sendJobToLeastLoadedGsNode(job);
+                    }
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public void run() {
+        while (running) {
+
+            // TODO request load from GS nodes & request jobs from highest loaded and send them to least loaded GS node
+
+            for (GridSchedulerNode gsNode : gridSchedulerNodes) {
+                if(!gsNode.getIsReplicaStatus()) {
+                    // ask each primary gs node for their load
+                    int load = gsNode.getNumberOfNonReplicatedJobs();
+                    gridSchedulersLoad.put(gsNode.getAddress(), load);
+                }else{
+                    gridSchedulersLoad.remove(gsNode.getAddress());
+                }
+            }
+
+            averageLoad = calculateAverageLoad();
+
+            requestJobFromGSnodeWithHigherThanAverageLoad(averageLoad);
+            averageLoad = 0;
+            // sleep
+            try
+            {
+                Thread.sleep(pollSleep);
+            } catch (InterruptedException ex) {
+                assert(false) : "Supervisor runtread was interrupted";
+            }
+        }
 
     }
+
 
     /**
      * After a resource manager tried to connect to the supervisor through the global socket,
@@ -143,6 +255,10 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     public void injectGSnodeFault(boolean status){
         //gridSchedulerNodes.get(0).setIsReplicaStatus(status);
         gridSchedulerNodes.get(0).toggleStatus();
+    }
+
+    public ArrayList<GridSchedulerNode> getGridSchedulerNodes() {
+        return this.gridSchedulerNodes;
     }
 
     /**
