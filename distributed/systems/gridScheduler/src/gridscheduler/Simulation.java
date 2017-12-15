@@ -60,7 +60,7 @@ public class Simulation implements Runnable,KeyListener {
 
 		// Setup the model. Create a grid scheduler and a set of clusters.
 		//scheduler = new GridSchedulerNode("scheduler1");
-		supervisor = new Supervisor("Supervisor",2,false); // TODO change this in order to have variable number of grid scheduler nodes
+		supervisor = new Supervisor("Supervisor",2,true); // TODO change this in order to have variable number of grid scheduler nodes
 
 		// Create a new gridscheduler panel so we can monitor our components
 		//gridSchedulerPanel = new GridSchedulerPanel(scheduler);
@@ -116,7 +116,7 @@ public class Simulation implements Runnable,KeyListener {
             stressTest(jobId++, 5);
 			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
 			//unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
-			// loadSameJobOnMultipleClusters(job,3); // load arg[2] clusters with the same job (almost) simultaneously
+			loadSameJobOnMultipleClusters(jobId,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
 				// Sleep a while before creating a new job

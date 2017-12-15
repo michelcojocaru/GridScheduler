@@ -171,7 +171,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 
 		//ask the GS to notify all the other RMs to remove the job from their queues (if present)
-		ControlMessage nMessage = new ControlMessage(ControlMessageType.RequestNotifyJobCompletion);
+		ControlMessage nMessage = new ControlMessage(ControlMessageType.NotifyJobCompletion);
 		nMessage.setSource(this.cluster.getName());
 		nMessage.setDestination(getGridSchedulerAddress());
 		nMessage.setJob(job);
@@ -217,8 +217,8 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		message.setSource(cluster.getName());
 		message.setDestination(supervisorURL);	//redundant I know...
 
+		// self registration through the supervisor
 		Socket.addMessageReceivedHandler(this);
-		//syncSocket.sendMessage(message, "localsocket://" + supervisorURL);
 
 	}
 
@@ -281,7 +281,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource()); // send back to the issuer of message
-			replyMessage.setLoad(getNumberOfNonReplicatedJobsWaiting()); // TODO change this to use moving average
+			replyMessage.setLoad(getNumberOfNonReplicatedJobsWaiting()); // TODO check for defects
 
 			syncSocket.sendMessage(replyMessage, "localsocket://" + controlMessage.getSource());
 
@@ -309,7 +309,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		}
 
 		// Grid Scheduler asks this RM to remove a pending job from its queue
-		if (controlMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
+		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
 			for(Job job:jobQueue){
 				if(job.getId() == controlMessage.getJob().getId()){
 					jobQueue.remove(job);

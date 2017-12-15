@@ -245,7 +245,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		}
 
 		// one of the clusters notified the GS that it completed a job
-		if (controlMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
+		if (controlMessage.getType() == ControlMessageType.NotifyJobCompletion){
 			//syncSocket.sendMessage(controlMessage,"localhost://placeholder"); //TODO this will no longer be necessary since the RMs are already notified
 			jobQueue.remove(controlMessage.getJob());
 			//TODO broadcast to all other GS nodes

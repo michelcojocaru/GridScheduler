@@ -11,7 +11,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     // a hashmap linking each grid scheduler to an estimated load
     private ConcurrentHashMap<String, Integer> gridSchedulersLoad = null;
 
-    //
+    // keep a hashmap with references all connected grid scheduler and their load
     private ConcurrentHashMap<GridSchedulerNode,Integer> gridSchedulerNodeConnectedRMs = null;
 
     // list of all the managed grid scheduler nodes
@@ -23,9 +23,10 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     // the arithmetic average of all grid scheduler nodes
     private int averageLoad;
 
+    // the minimum between each gs node number of RMs
     private static int minNoOfConnections = Integer.MAX_VALUE;
 
-    // polling frequency, 1hz
+    // polling frequency, 0.05hz for hot swapping
     private long pollSleep = 50;//1000
 
     // polling thread
@@ -79,6 +80,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
 
     }
 
+    // calculate the average load for all grid scheduler nodes
     private int calculateAverageLoad(){
         int average = 0;
 
@@ -96,7 +98,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
             }
         }
     }
-
+    // return the address of the least loaded gs node
     private String getLeastLoadedGsNodeAddress(){
 
         String address = null;
@@ -112,6 +114,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         return address;
     }
 
+    // additionaly is verifying that the @param address is primary (running)
     private GridSchedulerNode getLeastLoadedJobQueueGsNode(String address){
 
         for(GridSchedulerNode gsNode:gridSchedulerNodes){
@@ -132,6 +135,11 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         }
     }
 
+    /**
+     * extracts a job from one gs node job queue
+     * and sends it to the least loaded gs node
+     * @param gsNodeAddress
+     */
     private void sendJobRequest(String gsNodeAddress) {
 
         if (gsNodeAddress != null) {
@@ -140,7 +148,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
                     Job job = gsNode.getJobFromGsNodeJobQueue();
 
                     if(job != null){
-                        System.out.println("Job id: "+job.getId());
+                        System.out.println("Job id: " + job.getId());
                         sendJobToLeastLoadedGsNode(job);
                     }
                 }
@@ -154,8 +162,8 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     public void run() {
         while (running) {
 
-            // TODO request load from GS nodes & request jobs from highest loaded and send them to least loaded GS node
-
+            // request load from GS nodes & request jobs from highest
+            // loaded and send them to least loaded GS node
             for (GridSchedulerNode gsNode : gridSchedulerNodes) {
                 if(!gsNode.getIsReplicaStatus()) {
                     // ask each primary gs node for their load
@@ -169,7 +177,9 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
             averageLoad = calculateAverageLoad();
 
             requestJobFromGSnodeWithHigherThanAverageLoad(averageLoad);
+            // reset average load in order to not be poluted by old values
             averageLoad = 0;
+
             // sleep
             try
             {

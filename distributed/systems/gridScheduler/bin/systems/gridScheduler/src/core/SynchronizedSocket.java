@@ -154,7 +154,7 @@ public class SynchronizedSocket {
 			// send(cMessage,address);
 		}
 
-		if(cMessage.getType() == ControlMessageType.RequestNotifyJobCompletion){
+		if(cMessage.getType() == ControlMessageType.NotifyJobCompletion){
 			//System.out.println("Notify Job Completion from " + cMessage.getSource() + " to " + cMessage.getDestination());
 			broadcastToAll(cMessage);
 		}

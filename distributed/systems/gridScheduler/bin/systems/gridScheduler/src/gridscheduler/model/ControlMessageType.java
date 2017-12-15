@@ -18,7 +18,7 @@ public enum ControlMessageType {
 	RequestLoad,
 	RequestJob,
 	RequestNonReplicatedLoad,
-	RequestNotifyJobCompletion,
+	NotifyJobCompletion,
 
 	// both ways
 	AddJob,
