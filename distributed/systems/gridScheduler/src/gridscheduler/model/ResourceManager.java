@@ -91,6 +91,8 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		// check preconditions
 		assert(job != null) : "the parameter 'job' cannot be null";
 		assert(supervisorURL != null) : "No grid scheduler URL has been set for this resource manager";
+		job.setSubmit_time();
+		job.setWait_time();
 
 		// if the jobqueue is full, offload the job to the grid scheduler
 		if (jobQueue.size() >= jobQueueSize) {
@@ -110,7 +112,6 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			jobQueue.add(job);
 			scheduleJobs();
 		}
-
 	}
 
 	/**
@@ -152,6 +153,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		Job waitingJob;
 
 		while ( ((waitingJob = getWaitingJob()) != null) && ((freeNode = cluster.getFreeNode()) != null) ) {
+			waitingJob.setWait_time();
 			freeNode.startJob(waitingJob);
 		}
 
@@ -163,6 +165,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * pre: parameter 'job' cannot be null
 	 */
 	public void jobDone(Job job) {
+		job.setRun_time();
 		// preconditions
 		assert(job != null) : "parameter 'job' cannot be null";
 
@@ -178,7 +181,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		logger.info("Job " + job.getId() + " done on " + this.cluster.getName());
 		syncSocket.sendMessage(nMessage,"localsocket://" + getGridSchedulerAddress());
-
+		logger.info("Job"+job.getId()+"_"+job.getSubmit_time()+"_"+job.getWait_time()+"_"+job.getRun_time()); //Experimental data logging
 	}
 
 	/**

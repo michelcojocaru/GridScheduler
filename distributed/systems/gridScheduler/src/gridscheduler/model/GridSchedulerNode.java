@@ -4,7 +4,7 @@ import core.IMessageReceivedHandler;
 import core.Message;
 import core.SynchronizedSocket;
 import example.LocalSocket;
-import org.apache.log4j.Logger;
+import org.apache.log4j.*;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;

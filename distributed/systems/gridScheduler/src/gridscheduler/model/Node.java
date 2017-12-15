@@ -55,6 +55,7 @@ public class Node {
 	 * </DL>
 	 */
 	public void startJob(Job job) {
+		job.setRun_time();
 		// preconditions
 		assert(status == NodeStatus.Idle) : "The status of a node should be idle when it starts a job, but it's not.";
 
