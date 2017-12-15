@@ -91,6 +91,8 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		// check preconditions
 		assert(job != null) : "the parameter 'job' cannot be null";
 		assert(supervisorURL != null) : "No grid scheduler URL has been set for this resource manager";
+		job.setSubmit_time();
+		job.setWait_time();
 
 		// if the jobqueue is full, offload the job to the grid scheduler
 		if (jobQueue.size() >= jobQueueSize) {
@@ -110,7 +112,6 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			jobQueue.add(job);
 			scheduleJobs();
 		}
-
 	}
 
 	/**
@@ -151,9 +152,31 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		Node freeNode;
 		Job waitingJob;
 
-		while ( ((waitingJob = getWaitingJob()) != null) && ((freeNode = cluster.getFreeNode()) != null) ) {
-			freeNode.startJob(waitingJob);
+		while (true){
+			waitingJob = getWaitingJob();
+			freeNode = cluster.getFreeNode();
+			if (waitingJob != null && freeNode!=null) {
+				waitingJob.setWait_time();
+				//System.out.println("New job is assigned");
+				freeNode.startJob(waitingJob);
+			}
+			if (waitingJob==null) {
+				System.out.println("waiting job null");
+				break;
+			}
+			else  {
+				System.out.println("freenode null");
+				break;
+			}
 		}
+
+//		while ( ((waitingJob = getWaitingJob()) != null) && ((freeNode = cluster.getFreeNode()) != null) ) {
+	//		if (waitingJob == null) System.out.println("waitingJob == null");
+		//	if (freeNode == null) System.out.println("freenode == null");
+		//	waitingJob.setWait_time();
+			//System.out.println("New job is assigned");
+		//	freeNode.startJob(waitingJob);
+		//}
 
 	}
 
@@ -163,6 +186,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 	 * pre: parameter 'job' cannot be null
 	 */
 	public void jobDone(Job job) {
+		job.setRun_time();
 		// preconditions
 		assert(job != null) : "parameter 'job' cannot be null";
 
@@ -176,9 +200,9 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		nMessage.setDestination(getGridSchedulerAddress());
 		nMessage.setJob(job);
 
-		logger.info("Job " + job.getId() + " done on " + this.cluster.getName());
+		//logger.info("Job " + job.getId() + " done on " + this.cluster.getName());
 		syncSocket.sendMessage(nMessage,"localsocket://" + getGridSchedulerAddress());
-
+		logger.info("Job"+job.getId()+"_"+job.getSubmit_time()+"_"+job.getWait_time()+"_"+job.getRun_time()); //Experimental data logging
 	}
 
 	/**
@@ -275,7 +299,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 
 		// Grid scheduler asks for the load of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestLoad) {
-			logger.info("RM: " + this.cluster.getName() + " received a request load from GS: " + controlMessage.getSource());
+			//logger.info("RM: " + this.cluster.getName() + " received a request load from GS: " + controlMessage.getSource());
 
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyLoad);
 
@@ -290,7 +314,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 		// Grid scheduler asks for a job of this resource manager
 		if (controlMessage.getType() == ControlMessageType.RequestJob){
 
-			logger.info("RM: " + this.cluster.getName() + " received a job request from GS: " + controlMessage.getSource());
+			//logger.info("RM: " + this.cluster.getName() + " received a job request from GS: " + controlMessage.getSource());
 			ControlMessage replyMessage = new ControlMessage(ControlMessageType.ReplyJob);
 			replyMessage.setSource(this.cluster.getName());
 			replyMessage.setDestination(controlMessage.getSource());
@@ -313,7 +337,7 @@ public class ResourceManager implements INodeEventHandler, IMessageReceivedHandl
 			for(Job job:jobQueue){
 				if(job.getId() == controlMessage.getJob().getId()){
 					jobQueue.remove(job);
-					logger.warn("RM: " + this.cluster.getName() + " removed job " + job.getId() + " from its queue.");
+					//logger.warn("RM: " + this.cluster.getName() + " removed job " + job.getId() + " from its queue.");
 					break;
 				}
 			}

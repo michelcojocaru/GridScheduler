@@ -68,7 +68,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// preconditions
 		assert(address != null) : "parameter 'address' cannot be null";
 
-		logger.warn("GridSchedulerNode " + address + " created.");
+		//logger.warn("GridSchedulerNode " + address + " created.");
 
 		//
 		isReplica = true;
@@ -99,7 +99,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// preconditions
 		assert(address != null) : "parameter 'address' cannot be null";
 
-		logger.warn("GridSchedulerNode " + address + " created.");
+		//logger.warn("GridSchedulerNode " + address + " created.");
 
 		// set this instance as PRIMARY GS node
 		isReplica = false;
@@ -159,10 +159,10 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		//replica.jobQueue = this.jobQueue;
 		if (this.isReplica){
 			replica.registerToSyncSocket(this);
-			logger.warn("GS node " + replica.getAddress() + " became ACTIVE.");
+			//logger.warn("GS node " + replica.getAddress() + " became ACTIVE.");
 		}else {
 			this.registerToSyncSocket(replica);
-			logger.warn("GS node " + this.getAddress() + " became ACTIVE.");
+			//logger.warn("GS node " + this.getAddress() + " became ACTIVE.");
 		}
 
 
@@ -219,12 +219,12 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		// no jobs are scheduled to it until we know the actual load
 		if (controlMessage.getType() == ControlMessageType.ResourceManagerJoin) {
 			resourceManagersLoad.put(controlMessage.getSource(), Integer.MAX_VALUE);
-			logger.info("GS: " + controlMessage.getDestination() + " received a join request from RM: " + controlMessage.getSource());
+			//logger.info("GS: " + controlMessage.getDestination() + " received a join request from RM: " + controlMessage.getSource());
 		}
 		// resource manager wants to offload a job to us
 		if (controlMessage.getType() == ControlMessageType.AddJob) {
 			//TODO log the GS also into the visited cluster
-			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
+			//logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
 			Job job = controlMessage.getJob();
 			job.addClusterToVisited(this.getAddress());
 			jobQueue.add(job);
@@ -232,13 +232,13 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			
 		// one of the resource managers responded to a load request from this GS node
 		if (controlMessage.getType() == ControlMessageType.ReplyLoad) {
-			logger.info("GS: " + controlMessage.getDestination() + " received the load of: " + controlMessage.getLoad() + "% from RM: " + controlMessage.getSource());
+			//logger.info("GS: " + controlMessage.getDestination() + " received the load of: " + controlMessage.getLoad() + "% from RM: " + controlMessage.getSource());
 			resourceManagersLoad.put(controlMessage.getSource(), controlMessage.getLoad());
 		}
 
 		// one of the resource managers responded to a job request from this GS node
 		if (controlMessage.getType() == ControlMessageType.ReplyJob){
-			logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
+			//logger.info("GS: " + this.getAddress() + " received job " + controlMessage.getJob().getId() + " from RM: " + controlMessage.getSource());
 			Job job = controlMessage.getJob();
 			job.addClusterToVisited(this.getAddress());
 			jobQueue.add(controlMessage.getJob());
@@ -299,7 +299,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			cMessage.setDestination(target);
 
 			syncSocket.sendMessage(cMessage, "localsocket://" + target);
-			logger.info("[GridSchedulerNode] GS " + this.getAddress() + " sends job " + cMessage.getJob().getId() + " to RM: " + target);
+			//logger.info("[GridSchedulerNode] GS " + this.getAddress() + " sends job " + cMessage.getJob().getId() + " to RM: " + target);
 
 			jobQueue.remove(job);
 
@@ -343,7 +343,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 			cMessage.setDestination(target);
 
 			syncSocket.sendMessage(cMessage, "localsocket://" + target);
-			logger.info("[GridSchedulerNode] GS " + this.getAddress() + " request job from RM: " + target);
+			//logger.info("[GridSchedulerNode] GS " + this.getAddress() + " request job from RM: " + target);
 
 		}
 	}
@@ -361,6 +361,7 @@ public class GridSchedulerNode implements IMessageReceivedHandler, Runnable {
 		for (Job job:jobQueue){
 			if (job.getStatus() == JobStatus.Waiting && !job.getIsReplicated()){
 				jobQueue.remove(job);
+				System.out.println("Migrated job: " + job.getId());
 				job.addClusterToVisited(this.getAddress());
 				return job;
 			}

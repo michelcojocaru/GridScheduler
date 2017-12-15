@@ -80,12 +80,12 @@ public class Node {
 				runningJob.setStatus(JobStatus.Done);
 
 				// fire event handler
-				for (INodeEventHandler handler : handlers)
+				for (INodeEventHandler handler : handlers) {
 					handler.jobDone(runningJob);
-
-				// set node status
-				runningJob = null;
-				status = NodeStatus.Idle;
+					// set node status
+					runningJob = null;
+					status = NodeStatus.Idle;
+				}
 
 			}
 

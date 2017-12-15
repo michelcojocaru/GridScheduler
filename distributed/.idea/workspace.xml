@@ -4,16 +4,17 @@
     <list default="true" id="32d88e71-ff89-419b-8117-1fae83d386a3" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/.idea/workspace.xml" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/core/SynchronizedSocket.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/core/SynchronizedSocket.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/Simulation.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/Simulation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Job.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Job.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Node.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Node.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/bin/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/core/SynchronizedSocket.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/core/SynchronizedSocket.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" afterPath="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" />
     </list>
@@ -35,14 +36,14 @@
     <favorites_list name="distributed" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5207668">
+    <splitter split-orientation="horizontal" split-proportion="0.6025145">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="Supervisor.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1170">
-                  <caret line="82" column="62" lean-forward="false" selection-start-line="82" selection-start-column="62" selection-end-line="82" selection-end-column="62" />
+                <state relative-caret-position="-3209">
+                  <caret line="29" column="30" lean-forward="false" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -53,8 +54,8 @@
           <file leaf-file-name="GridSchedulerStatusPanel.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="690">
-                  <caret line="49" column="41" lean-forward="false" selection-start-line="49" selection-start-column="41" selection-end-line="49" selection-end-column="41" />
+                <state relative-caret-position="425">
+                  <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -63,8 +64,41 @@
           <file leaf-file-name="Simulation.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1684">
-                  <caret line="211" column="93" lean-forward="false" selection-start-line="211" selection-start-column="93" selection-end-line="211" selection-end-column="93" />
+                <state relative-caret-position="6">
+                  <caret line="20" column="62" lean-forward="false" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
+                  <folding>
+                    <element signature="e#6127#6128#0" expanded="true" />
+                    <element signature="e#6151#6152#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="log4j2.xml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/log4j2.xml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="120">
+                  <caret line="8" column="46" lean-forward="false" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="46" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="GridSchedulerPanel.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerPanel.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="336">
+                  <caret line="71" column="42" lean-forward="false" selection-start-line="71" selection-start-column="32" selection-end-line="71" selection-end-column="42" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="StatusPanel.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/StatusPanel.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="150">
+                  <caret line="10" column="22" lean-forward="false" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
                   <folding />
                 </state>
               </provider>
@@ -73,14 +107,11 @@
           <file leaf-file-name="Job.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="765">
-                  <caret line="53" column="38" lean-forward="false" selection-start-line="53" selection-start-column="38" selection-end-line="53" selection-end-column="38" />
+                <state relative-caret-position="1035">
+                  <caret line="73" column="16" lean-forward="false" selection-start-line="73" selection-start-column="16" selection-end-line="73" selection-end-column="16" />
                   <folding>
-                    <element signature="e#2229#2230#0" expanded="true" />
-                    <element signature="e#2260#2261#0" expanded="true" />
-                    <element signature="e#2313#2314#0" expanded="true" />
-                    <element signature="e#2352#2353#0" expanded="true" />
-                    <marker date="1512734193521" expanded="true" signature="1485:1488" ph=" }" />
+                    <element signature="e#1905#1906#0" expanded="true" />
+                    <element signature="e#1963#1964#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -89,21 +120,19 @@
           <file leaf-file-name="Cluster.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2220">
-                  <caret line="160" column="35" lean-forward="false" selection-start-line="160" selection-start-column="35" selection-end-line="160" selection-end-column="35" />
+                <state relative-caret-position="1545">
+                  <caret line="115" column="16" lean-forward="false" selection-start-line="115" selection-start-column="16" selection-end-line="115" selection-end-column="16" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="SynchronizedSocket.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/core/SynchronizedSocket.java">
+          <file leaf-file-name="INodeEventHandler.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/INodeEventHandler.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2145">
-                  <caret line="156" column="52" lean-forward="false" selection-start-line="156" selection-start-column="52" selection-end-line="156" selection-end-column="52" />
-                  <folding>
-                    <marker date="1512760991940" expanded="true" signature="3461:5378" ph="{...}" />
-                  </folding>
+                <state relative-caret-position="195">
+                  <caret line="13" column="20" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -112,34 +141,45 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="ResourceManager.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java">
+          <file leaf-file-name="Node.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1065">
-                  <caret line="79" column="86" lean-forward="false" selection-start-line="79" selection-start-column="83" selection-end-line="79" selection-end-column="86" />
-                  <folding>
-                    <element signature="e#5891#5892#0" expanded="true" />
-                    <element signature="e#5918#5919#0" expanded="true" />
-                    <element signature="e#5945#5946#0" expanded="true" />
-                    <element signature="e#5963#5964#0" expanded="true" />
-                    <element signature="e#5999#6000#0" expanded="true" />
-                    <element signature="e#6022#6023#0" expanded="true" />
-                    <element signature="e#6057#6058#0" expanded="true" />
-                    <element signature="e#6084#6085#0" expanded="true" />
-                    <element signature="e#6873#6874#0" expanded="true" />
-                    <element signature="e#6908#6909#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="233">
+                  <caret line="83" column="28" lean-forward="false" selection-start-line="83" selection-start-column="28" selection-end-line="83" selection-end-column="28" />
+                  <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="GridSchedulerNode.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="ResourceManager.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="48">
+                  <caret line="183" column="36" lean-forward="true" selection-start-line="183" selection-start-column="36" selection-end-line="183" selection-end-column="36" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="gridSchduler.log" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/systems/gridScheduler/logs/gridSchduler.log">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="240">
+                  <caret line="16" column="20" lean-forward="false" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="20" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="GridSchedulerNode.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="349">
-                  <caret line="303" column="33" lean-forward="false" selection-start-line="303" selection-start-column="33" selection-end-line="303" selection-end-column="33" />
+                <state relative-caret-position="149">
+                  <caret line="359" column="34" lean-forward="false" selection-start-line="359" selection-start-column="34" selection-end-line="359" selection-end-column="34" />
                   <folding>
                     <element signature="imports" expanded="true" />
+                    <element signature="e#11074#11075#0" expanded="true" />
+                    <element signature="e#11103#11104#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -170,11 +210,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Scheduler name</find>
-      <find>keyS</find>
-      <find>no of co</find>
-      <find>connected</find>
-      <find>received a join request from RM:</find>
       <find>was added to Jobs</find>
       <find>received a job from RM:</find>
       <find>System.out</find>
@@ -187,7 +222,6 @@
       <find>active</find>
       <find>DOWN</find>
       <find>Active</find>
-      <find>INCR</find>
       <find>jobQueueSize</find>
       <find>run</find>
       <find>cluster2</find>
@@ -200,14 +234,20 @@
       <find>gridSchedulersLoad</find>
       <find>RequestN</find>
       <find>put</find>
+      <find>Adresa gs target</find>
+      <find>Job id</find>
+      <find>duration</find>
+      <find>INCR</find>
+      <find>lim</find>
+      <find>logger.</find>
     </findStrings>
     <replaceStrings>
       <replace>NotifyJobCompletion</replace>
     </replaceStrings>
     <dirStrings>
-      <dir>$PROJECT_DIR$</dir>
       <dir>$PROJECT_DIR$/systems/gridScheduler</dir>
       <dir>$PROJECT_DIR$/systems/gridScheduler/src</dir>
+      <dir>$PROJECT_DIR$</dir>
     </dirStrings>
   </component>
   <component name="Git.Settings">
@@ -260,13 +300,15 @@
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/log4j2.xml" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java" />
-        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java" />
-        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java" />
-        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/core/SynchronizedSocket.java" />
-        <option value="$PROJECT_DIR$/systems/gridScheduler/logs/gridSchduler.log" />
+        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java" />
+        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java" />
+        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java" />
+        <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java" />
+        <option value="$APPLICATION_CONFIG_DIR$/idea.properties" />
+        <option value="$PROJECT_DIR$/systems/gridScheduler/logs/gridSchduler.log" />
         <option value="$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java" />
       </list>
     </option>
@@ -306,7 +348,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -370,6 +412,14 @@
               <item name="gridScheduler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="gridscheduler" type="462c0819:PsiDirectoryNode" />
+              <item name="gui" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="distributed" type="b2602c69:ProjectViewProjectNode" />
+              <item name="distributed" type="462c0819:PsiDirectoryNode" />
+              <item name="gridScheduler" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="gridscheduler" type="462c0819:PsiDirectoryNode" />
               <item name="model" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -377,7 +427,7 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -850,6 +900,7 @@
       <workItem from="1512999328602" duration="1528000" />
       <workItem from="1513183266093" duration="677000" />
       <workItem from="1513265461405" duration="96000" />
+      <workItem from="1513357725531" duration="10469000" />
     </task>
     <task id="LOCAL-00001" summary="GS balancing first try (nothing works)">
       <created>1512560486451</created>
@@ -862,7 +913,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="201373000" />
+    <option name="totallyTimeSpent" value="211842000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -879,15 +930,17 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329602" sideWeight="0.49713877" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.48855507" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.35199004" sideWeight="0.50858366" order="0" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19410568" sideWeight="0.4914163" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29726368" sideWeight="0.4914163" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1702432" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26037195" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.49713877" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -900,12 +953,10 @@
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="10" side_tool="false" content_ui="combo" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3283582" sideWeight="0.48855507" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297568" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3292683" sideWeight="0.49713877" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -921,14 +972,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java</url>
-          <line>109</line>
-          <properties />
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-      </breakpoints>
       <option name="time" value="18" />
     </breakpoint-manager>
     <watches-manager />
@@ -938,13 +981,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home/src.zip!/java/awt/event/KeyEvent.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-743">
-          <caret line="151" column="13" lean-forward="false" selection-start-line="151" selection-start-column="13" selection-end-line="151" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home/src.zip!/java/lang/Class.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="172">
@@ -1082,13 +1118,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/StatusPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="22" lean-forward="false" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/.idea/modules.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -1139,14 +1168,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/INodeEventHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="23" lean-forward="false" selection-start-line="10" selection-start-column="23" selection-end-line="10" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/NodeStatus.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -1182,22 +1203,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridSchedulerNode/logs/gridSchduler.log" />
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/log4j2.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="71" lean-forward="false" selection-start-line="7" selection-start-column="71" selection-end-line="7" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="52" column="66" lean-forward="false" selection-start-line="52" selection-start-column="66" selection-end-line="52" selection-end-column="66" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/core/Message.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -1232,22 +1237,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1050">
-          <caret line="72" column="16" lean-forward="false" selection-start-line="72" selection-start-column="16" selection-end-line="72" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2220">
-          <caret line="160" column="35" lean-forward="false" selection-start-line="160" selection-start-column="35" selection-end-line="160" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_73.jdk/Contents/Home/src.zip!/java/util/ArrayList.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="241">
@@ -1270,28 +1259,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="53" column="38" lean-forward="false" selection-start-line="53" selection-start-column="38" selection-end-line="53" selection-end-column="38" />
-          <folding>
-            <element signature="e#2229#2230#0" expanded="true" />
-            <element signature="e#2260#2261#0" expanded="true" />
-            <element signature="e#2313#2314#0" expanded="true" />
-            <element signature="e#2352#2353#0" expanded="true" />
-            <marker date="1512734193521" expanded="true" signature="1485:1488" ph=" }" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="690">
-          <caret line="49" column="41" lean-forward="false" selection-start-line="49" selection-start-column="41" selection-end-line="49" selection-end-column="41" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ControlMessageType.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
@@ -1304,62 +1271,130 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2145">
           <caret line="156" column="52" lean-forward="false" selection-start-line="156" selection-start-column="52" selection-end-line="156" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="71" column="42" lean-forward="false" selection-start-line="71" selection-start-column="32" selection-end-line="71" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/StatusPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="22" lean-forward="false" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/gui/GridSchedulerStatusPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Job.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1035">
+          <caret line="73" column="16" lean-forward="false" selection-start-line="73" selection-start-column="16" selection-end-line="73" selection-end-column="16" />
           <folding>
-            <marker date="1512760991940" expanded="true" signature="3461:5378" ph="{...}" />
+            <element signature="e#1905#1906#0" expanded="true" />
+            <element signature="e#1963#1964#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java">
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Cluster.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1065">
-          <caret line="79" column="86" lean-forward="false" selection-start-line="79" selection-start-column="83" selection-end-line="79" selection-end-column="86" />
-          <folding>
-            <element signature="e#5891#5892#0" expanded="true" />
-            <element signature="e#5918#5919#0" expanded="true" />
-            <element signature="e#5945#5946#0" expanded="true" />
-            <element signature="e#5963#5964#0" expanded="true" />
-            <element signature="e#5999#6000#0" expanded="true" />
-            <element signature="e#6022#6023#0" expanded="true" />
-            <element signature="e#6057#6058#0" expanded="true" />
-            <element signature="e#6084#6085#0" expanded="true" />
-            <element signature="e#6873#6874#0" expanded="true" />
-            <element signature="e#6908#6909#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="303" column="33" lean-forward="false" selection-start-line="303" selection-start-column="33" selection-end-line="303" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="1545">
+          <caret line="115" column="16" lean-forward="false" selection-start-line="115" selection-start-column="16" selection-end-line="115" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Supervisor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1170">
-          <caret line="82" column="62" lean-forward="false" selection-start-line="82" selection-start-column="62" selection-end-line="82" selection-end-column="62" />
+        <state relative-caret-position="-3209">
+          <caret line="29" column="30" lean-forward="false" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/log4j2.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="46" lean-forward="false" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/Node.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="233">
+          <caret line="83" column="28" lean-forward="false" selection-start-line="83" selection-start-column="28" selection-end-line="83" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/idea.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="37" lean-forward="false" selection-start-line="2" selection-start-column="37" selection-end-line="2" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/GridSchedulerNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="359" column="34" lean-forward="false" selection-start-line="359" selection-start-column="34" selection-end-line="359" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#11074#11075#0" expanded="true" />
+            <element signature="e#11103#11104#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/INodeEventHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="20" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/model/ResourceManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="183" column="36" lean-forward="true" selection-start-line="183" selection-start-column="36" selection-end-line="183" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6">
+          <caret line="20" column="62" lean-forward="false" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
+          <folding>
+            <element signature="e#6127#6128#0" expanded="true" />
+            <element signature="e#6151#6152#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/systems/gridScheduler/logs/gridSchduler.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="16" column="161" lean-forward="true" selection-start-line="16" selection-start-column="161" selection-end-line="16" selection-end-column="161" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/systems/gridScheduler/src/gridscheduler/Simulation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1684">
-          <caret line="211" column="93" lean-forward="false" selection-start-line="211" selection-start-column="93" selection-end-line="211" selection-end-column="93" />
+        <state relative-caret-position="240">
+          <caret line="16" column="20" lean-forward="false" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="20" />
           <folding />
         </state>
       </provider>

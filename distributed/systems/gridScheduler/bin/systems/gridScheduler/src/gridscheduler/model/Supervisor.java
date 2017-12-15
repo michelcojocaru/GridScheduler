@@ -27,7 +27,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
     private static int minNoOfConnections = Integer.MAX_VALUE;
 
     // polling frequency, 0.05hz for hot swapping
-    private long pollSleep = 50;//1000
+    private long pollSleep = 5;//1000
 
     // polling thread
     private Thread pollingThread;
@@ -130,7 +130,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
         //System.out.println("targetGSNodeAddress: " + targetAddress);
         GridSchedulerNode targetGsNode = getLeastLoadedJobQueueGsNode(targetAddress);
         if(targetGsNode != null) {
-            System.out.println("Adresa gs target: " + targetGsNode.getAddress());
+            //System.out.println("Adresa gs target: " + targetGsNode.getAddress());
             targetGsNode.addJob(job);
         }
     }
@@ -148,7 +148,7 @@ public class Supervisor implements IMessageReceivedHandler, Runnable {
                     Job job = gsNode.getJobFromGsNodeJobQueue();
 
                     if(job != null){
-                        System.out.println("Job id: " + job.getId());
+                        //System.out.println("Job id: " + job.getId());
                         sendJobToLeastLoadedGsNode(job);
                     }
                 }

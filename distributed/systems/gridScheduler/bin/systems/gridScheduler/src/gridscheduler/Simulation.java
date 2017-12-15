@@ -26,10 +26,10 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Simulation implements Runnable,KeyListener {
 	// Number of clusters in the simulation
-	private final static int nrClusters = 4;
+	private final static int nrClusters = 8;
 
 	// Number of nodes per cluster in the simulation
-	private final static int nrNodes = 12;
+	private final static int nrNodes = 1000;
 
 	// Simulation components
 	Cluster clusters[];
@@ -38,14 +38,15 @@ public class Simulation implements Runnable,KeyListener {
 
     private Supervisor supervisor = null;
 
-	private static long jobCreationRatio = 200L;
-	private static long jobDuration = 2000L;//8000L
+	private static long jobCreationRatio = 50L;
+	private static long jobDuration = 40000L;//8000L
 
     private boolean gsNodeFaultToggle = false;
 
 	private final static Logger logger = Logger.getLogger(Simulation.class.getName());
 	private static DecimalFormat df2 = new DecimalFormat(".##");
 
+	public long jobId;
 	/**
 	 * Constructs a new simulation object. Study this code to see how to set up your own
 	 * simulation.
@@ -57,17 +58,18 @@ public class Simulation implements Runnable,KeyListener {
 		// TODO if something goes wrong recheck this logic
 		//GridSchedulerNode scheduler;
 
+		jobId = 0;
 
 		// Setup the model. Create a grid scheduler and a set of clusters.
 		//scheduler = new GridSchedulerNode("scheduler1");
-		supervisor = new Supervisor("Supervisor",2,true); // TODO change this in order to have variable number of grid scheduler nodes
+		supervisor = new Supervisor("Supervisor",4,false); // TODO change this in order to have variable number of grid scheduler nodes
 
 		// Create a new gridscheduler panel so we can monitor our components
 		//gridSchedulerPanel = new GridSchedulerPanel(scheduler);
 		gridSchedulerPanel = new GridSchedulerPanel(supervisor);
 		gridSchedulerPanel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		logger.info("Simulation started.");
+		//logger.info("Simulation started.");
 
 		// Create the clusters and nods
 		clusters = new Cluster[nrClusters];
@@ -102,21 +104,22 @@ public class Simulation implements Runnable,KeyListener {
 	 */
 	public void run() {
 
-		long jobId = 0;
+
 		gridSchedulerPanel.addKeyListener(this);
 
         int highLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
         int lowLoadTargetCluster = ThreadLocalRandom.current().nextInt(0, nrClusters);
 		// Do not stop the simulation as long as the gridscheduler panel remains open
-		while (gridSchedulerPanel.isVisible()) {
+		long jobLimit = 10000;
+		while (gridSchedulerPanel.isVisible() && jobId < jobLimit) {
 
-
+			System.out.println("Job id: " + jobId);
 			// Uncomment one at a time in order to simulate different behaviours
             //idealLoad(jobId++);
-            stressTest(jobId++, 5);
+            //stressTest(jobId++, 5);
 			//evenLoad(jobId++); // randomly distributes jobs to cluster (nearly uniform distribution)
-			//unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
-			loadSameJobOnMultipleClusters(jobId,3); // load arg[2] clusters with the same job (almost) simultaneously
+			unEvenLoad(jobId++, highLoadTargetCluster, lowLoadTargetCluster,5); //TODO make the ratio parameterized (extreme high load)
+			//loadSameJobOnMultipleClusters(jobId,3); // load arg[2] clusters with the same job (almost) simultaneously
 
 			try {
 				// Sleep a while before creating a new job
@@ -170,6 +173,10 @@ public class Simulation implements Runnable,KeyListener {
 		for(int i = 0; i < noClusters; i++) {
 			clusters[ThreadLocalRandom.current().nextInt(0, nrClusters)].getResourceManager().addJob(job);
 		}
+	}
+
+	public long getJobId(){
+		return this.jobId;
 	}
 
 	@Override

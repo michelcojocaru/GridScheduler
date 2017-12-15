@@ -47,7 +47,7 @@ public class Cluster implements Runnable {
 		assert(supervisor != null) : "parameter 'supervisor' cannot be null";
 		assert(nodeCount > 0) : "parameter 'nodeCount' cannot be smaller or equal to zero";
 
-		logger.warn("Cluster " + name + " created.");
+		//logger.warn("Cluster " + name + " created.");
 
 		// Initialize members
 		this.address = name;

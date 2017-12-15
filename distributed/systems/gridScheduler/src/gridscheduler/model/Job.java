@@ -55,13 +55,13 @@ public class Job {
 
 	public void addClusterToVisited(String cluster){
 		visitedClusters.add(cluster);
-		logger.info("Cluster: " + cluster + " was added to Job " + this.getId() + " visited queue.");
+		//logger.info("Cluster: " + cluster + " was added to Job " + this.getId() + " visited queue.");
 	}
 
 	public void removeClusterFromVisited(String cluster){
 		if(visitedClusters.contains(cluster)){
 			visitedClusters.remove(cluster);
-			logger.info("Cluster: " + cluster + " was removed from Jobs " + this.getId() + " visited queue.");
+			//logger.info("Cluster: " + cluster + " was removed from Jobs " + this.getId() + " visited queue.");
 		}
 	}
 

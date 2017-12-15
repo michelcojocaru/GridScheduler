@@ -35,12 +35,12 @@ public class SynchronizedSocket {
 			gridSchedulerNode.onMessageReceived(joinRequestMessage);
 		}
 
-		logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchdulerNodeAddress);//gridSchedulerNode.getAddress());
+		//logger.info("RM: " + resourceManager.getName() + " registered to " + gridSchdulerNodeAddress);//gridSchedulerNode.getAddress());
 	}
 
 	public void addMessageReceivedHandler(GridSchedulerNode gsNode) {
 		gridSchedulerNode = gsNode;
-		logger.info("GS node: " + gridSchedulerNode.getAddress() + " registered to Supervisor");
+		//logger.info("GS node: " + gridSchedulerNode.getAddress() + " registered to Supervisor");
 
 	}
 
@@ -64,7 +64,7 @@ public class SynchronizedSocket {
 
 			for (ResourceManager resourceManager : resourceManagers) {
 				if (cMessage.getDestination().equals(resourceManager.getName())) {
-					logger.info("GS: " + cMessage.getSource() + " is sending a " + cMessage.getType() + " message to RM: " + resourceManager.getName());
+					//logger.info("GS: " + cMessage.getSource() + " is sending a " + cMessage.getType() + " message to RM: " + resourceManager.getName());
 					resourceManager.onMessageReceived(cMessage);
 					break;
 				}
@@ -79,7 +79,7 @@ public class SynchronizedSocket {
 
 		for (ResourceManager resourceManager : resourceManagers) {
 			if (!cMessage.getSource().equals(resourceManager.getName())) {
-				logger.info("GS: " + cMessage.getSource() + " is sending a job " + cMessage.getJob().getId() + " removal request to RM: " + resourceManager.getName());
+				//logger.info("GS: " + cMessage.getSource() + " is sending a job " + cMessage.getJob().getId() + " removal request to RM: " + resourceManager.getName());
 				resourceManager.onMessageReceived(cMessage);
 			}
 		}
